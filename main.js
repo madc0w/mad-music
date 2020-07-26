@@ -1,20 +1,24 @@
-const numNotes = 24;
+const noteNames = [
+	'A3', 'A3#', 'B3', 'C3', 'C3#', 'D3', 'D3#', 'E3', 'F3', 'F3#', 'G3', 'A4', 'A4#', 'B4', 'C4', 'C4#', 'D4', 'D4#', 'E4', 'F4', 'F4#', 'G4',
+];
 const lowFreq = 220;
 const attack = 400;
 const decay = attack;
 
 const audioCtx = new AudioContext();
 const notes = [];
-var playPauseSpan;
+const playing = {};
+var playingNotesDiv;
 
 function onLoad() {
-	playPauseSpan = document.getElementById('play-pause');
+	playingNotesDiv = document.getElementById('playing-notes');
 
 	var didInit = false;
 	function f() {
 		if (!didInit) {
 			didInit = true;
-			for (var i = 0; i < numNotes; i++) {
+			for (var i = 0; i < noteNames.length; i++) {
+				const name = noteNames[i];
 				const gainNode = audioCtx.createGain();
 				const oscillator = audioCtx.createOscillator();
 				oscillator.connect(gainNode);
@@ -23,6 +27,7 @@ function onLoad() {
 				oscillator.start(0);
 				gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
 				notes.push({
+					name,
 					id: i,
 					oscillator,
 					gainNode,
@@ -39,20 +44,24 @@ function onLoad() {
 	window.addEventListener('click', f);
 }
 
-const isPlaying = {};
 function togglePlay(note) {
-	isPlaying[note.id] = !isPlaying[note.id];
+	playing[note.id] = playing[note.id] ? null : note;
+	var html = '';
+	for (const noteId in playing) {
+		if (playing[noteId]) {
+			html += playing[noteId].name + ' ';
+		}
+	}
+	playingNotesDiv.innerHTML = html;
 
-	if (isPlaying[note.id]) {
+	if (playing[note.id]) {
 		note.gainNode.connect(audioCtx.destination);
-		playPauseSpan.innerHTML = 'pause';
 	} else {
 		setTimeout(() => {
 			note.gainNode.disconnect(audioCtx.destination);
 		}, decay);
-		playPauseSpan.innerHTML = 'play';
 	}
-	ramp(note, isPlaying[note.id]);
+	ramp(note, !!playing[note.id]);
 }
 
 const isRamping = {};
