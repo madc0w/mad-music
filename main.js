@@ -13,67 +13,92 @@ const decay = attack;
 
 const audioCtx = new AudioContext();
 const notes = [];
-const playing = {};
-const currSequence = {};
+var playing = {};
+var currSequence = {};
 var startTime;
 var playingNotesDiv;
+const sequenceInteravalIds = [];
 
 function onLoad() {
 	playingNotesDiv = document.getElementById('playing-notes');
-
-	var didInit = false;
-	function f() {
-		if (!didInit) {
-			startTime = new Date().getTime();
-			didInit = true;
-			for (var i = 0; i < noteNames.length; i++) {
-				const name = noteNames[i];
-				const gainNode = audioCtx.createGain();
-				const oscillator = audioCtx.createOscillator();
-				oscillator.connect(gainNode);
-				oscillator.frequency.value = lowFreq * Math.pow(2, i / 12);
-				// oscillator.detune.value = 100; // value in cents
-				oscillator.start(0);
-				gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-				notes.push({
-					name,
-					id: i,
-					oscillator,
-					gainNode,
-				});
-				gainNode.gain.minValue = 0;
-				gainNode.gain.maxValue = 1;
+	stopButton = document.getElementById('stop-button');
+	stopButton.onclick = () => {
+		for (const noteId in playing) {
+			if (playing[noteId]) {
+				togglePlay(playing[noteId]);
 			}
 		}
-		startSequence();
+		playing = {};
+		currSequence = {};
+		for (const id of sequenceInteravalIds) {
+			clearInterval(id);
+		}
+		refreshDisplay();
+	};
+
+	var didInit = false;
+	function f(event) {
+		if (event.srcElement.id != 'stop-button') {
+			if (!didInit) {
+				startTime = new Date().getTime();
+				didInit = true;
+				for (var i = 0; i < noteNames.length; i++) {
+					const name = noteNames[i];
+					const gainNode = audioCtx.createGain();
+					const oscillator = audioCtx.createOscillator();
+					oscillator.connect(gainNode);
+					oscillator.frequency.value = lowFreq * Math.pow(2, i / 12);
+					// oscillator.detune.value = 100; // value in cents
+					oscillator.start(0);
+					gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+					notes.push({
+						name,
+						id: i,
+						oscillator,
+						gainNode,
+					});
+					gainNode.gain.minValue = 0;
+					gainNode.gain.maxValue = 1;
+				}
+
+				setInterval(() => {
+					if (Math.random() < startSequenceProbability) {
+						startSequence();
+					}
+				}, tempo);
+			}
+			startSequence();
+		}
 	}
 	addEventListener('keydown', f);
 	addEventListener('click', f);
-
-	setInterval(() => {
-		if (Math.random() < startSequenceProbability) {
-			startSequence();
-		}
-	}, tempo);
 }
 
 function startSequence() {
-	const note = notes[Math.floor(Math.random() * notes.length)];
+	var note;
+	do {
+		note = notes[Math.floor(Math.random() * notes.length)];
+	} while (currSequence[note.id]);
 	const factor = Math.ceil(Math.random() * 8);
 
 	const syncTime = tempo - (new Date().getTime() % tempo);
 	setTimeout(() => {
-		console.log('starting ' + note.name);
-		currSequence[note.id] = note;
-		const intervalId = setInterval(f, factor * tempo);
-		f();
-		function f() {
-			if (!togglePlay(note) && Math.random() < stopSequenceProbability) {
-				console.log('stopping ' + note.name);
-				clearInterval(intervalId);
-				playing[note.id] = null;
-				currSequence[note.id] = null;
-				refreshDisplay();
+		if (currSequence[note.id]) {
+			console.log('already playing sequence ' + note.name);
+		} else {
+			console.log('starting ' + note.name);
+			currSequence[note.id] = note;
+			const intervalId = setInterval(f, factor * tempo);
+			sequenceInteravalIds.push(intervalId);
+			f();
+			function f() {
+				if (!togglePlay(note) && Math.random() < stopSequenceProbability) {
+					console.log('stopping ' + note.name);
+					clearInterval(intervalId);
+					playing[note.id] = null;
+					currSequence[note.id] = null;
+					refreshDisplay();
+				}
 			}
 		}
 	}, syncTime);
