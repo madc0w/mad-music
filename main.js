@@ -12,7 +12,6 @@ function onLoad() {
 	playPauseSpan = document.getElementById('play-pause');
 
 	for (var i = 0; i < numNotes; i++) {
-		audioCtx.createOscillator();
 		const gainNode = audioCtx.createGain();
 		const oscillator = audioCtx.createOscillator();
 		oscillator.connect(gainNode);
