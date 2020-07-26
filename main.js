@@ -1,3 +1,6 @@
+const startSequenceProbability = 0.1;
+const stopSequenceProbability = 0.2;
+const tempo = 400;
 const noteNames = [
 	'A3', 'A3#', 'B3', 'C3', 'C3#', 'D3', 'D3#', 'E3', 'F3', 'F3#', 'G3', 'A4', 'A4#', 'B4', 'C4', 'C4#', 'D4', 'D4#', 'E4', 'F4', 'F4#', 'G4',
 ];
@@ -11,6 +14,8 @@ const decay = attack;
 const audioCtx = new AudioContext();
 const notes = [];
 const playing = {};
+const currSequence = {};
+var startTime;
 var playingNotesDiv;
 
 function onLoad() {
@@ -19,6 +24,7 @@ function onLoad() {
 	var didInit = false;
 	function f() {
 		if (!didInit) {
+			startTime = new Date().getTime();
 			didInit = true;
 			for (var i = 0; i < noteNames.length; i++) {
 				const name = noteNames[i];
@@ -35,36 +41,59 @@ function onLoad() {
 					oscillator,
 					gainNode,
 				});
+				gainNode.gain.minValue = 0;
+				gainNode.gain.maxValue = 1;
 			}
-
-			gainNode.gain.minValue = 0;
-			gainNode.gain.maxValue = 1;
 		}
-		const note = notes[Math.floor(Math.random() * notes.length)];
-		togglePlay(note);
+		startSequence();
 	}
 	addEventListener('keydown', f);
 	addEventListener('click', f);
+
+	setInterval(() => {
+		if (Math.random() < startSequenceProbability) {
+			startSequence();
+		}
+	}, tempo);
+}
+
+function startSequence() {
+	const note = notes[Math.floor(Math.random() * notes.length)];
+	const factor = Math.ceil(Math.random() * 8);
+
+	const syncTime = tempo - (new Date().getTime() % tempo);
+	setTimeout(() => {
+		console.log('starting ' + note.name);
+		currSequence[note.id] = note;
+		const intervalId = setInterval(f, factor * tempo);
+		f();
+		function f() {
+			if (!togglePlay(note) && Math.random() < stopSequenceProbability) {
+				console.log('stopping ' + note.name);
+				clearInterval(intervalId);
+				playing[note.id] = null;
+				currSequence[note.id] = null;
+				refreshDisplay();
+			}
+		}
+	}, syncTime);
 }
 
 function togglePlay(note) {
 	playing[note.id] = playing[note.id] ? null : note;
-	var html = '';
-	for (const noteId in playing) {
-		if (playing[noteId]) {
-			html += playing[noteId].name + ' ';
-		}
-	}
-	playingNotesDiv.innerHTML = html;
+	refreshDisplay();
 
 	if (playing[note.id]) {
+		console.log('playing ' + note.name);
 		note.gainNode.connect(audioCtx.destination);
 	} else {
 		setTimeout(() => {
 			note.gainNode.disconnect(audioCtx.destination);
 		}, decay);
 	}
-	ramp(note, !!playing[note.id]);
+	const isPlay = !!playing[note.id];
+	ramp(note, isPlay);
+	return isPlay;
 }
 
 const isRamping = {};
@@ -90,4 +119,17 @@ function ramp(note, isUp) {
 			}
 		}, interval);
 	}
+}
+
+function refreshDisplay() {
+	var html = '';
+	for (const noteId in currSequence) {
+		if (currSequence[noteId]) {
+			const className = playing[noteId] ? 'playing' : '';
+			html += `<span class="note ${className}">`;
+			html += currSequence[noteId].name;
+			html += '</span>';
+		}
+	}
+	playingNotesDiv.innerHTML = html;
 }

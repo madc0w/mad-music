@@ -1,8 +1,16 @@
 body {
-	background-color: #eef;
+	background-color: #0fc;
 	font-family: Arial;
 }
 
 h1 {
 	color: blue;
+}
+
+.note {
+	margin-right: 8px;
+}
+
+.playing {
+	font-weight: bold;
 }
