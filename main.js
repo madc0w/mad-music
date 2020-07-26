@@ -1,55 +1,63 @@
+const numNotes = 24;
+const lowFreq = 220;
 const attack = 400;
 const decay = attack;
 
 var isPlaying = false;
-var didInit = false;
 const audioCtx = new AudioContext();
-const oscillator = audioCtx.createOscillator();
-const gainNode = audioCtx.createGain();
+const notes = [];
 var playPauseSpan;
 
 function onLoad() {
 	playPauseSpan = document.getElementById('play-pause');
-	window.addEventListener('keydown', togglePlay);
-	window.addEventListener('click', togglePlay);
-}
 
-function init() {
-	didInit = true;
+	for (var i = 0; i < numNotes; i++) {
+		audioCtx.createOscillator();
+		const gainNode = audioCtx.createGain();
+		const oscillator = audioCtx.createOscillator();
+		oscillator.connect(gainNode);
+		oscillator.frequency.value = lowFreq * Math.pow(2, i / 12);
+		// oscillator.detune.value = 100; // value in cents
+		oscillator.start(0);
+		gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+		notes.push({
+			id: i,
+			oscillator,
+			gainNode,
+		});
+	}
 
-	oscillator.connect(gainNode);
-	oscillator.frequency.value = 400;
-	// oscillator.detune.value = 100; // value in cents
-	oscillator.start(0);
-	gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
 	// gainNode.gain.minValue = volume;
 	// gainNode.gain.maxValue = volume;
+	function f() {
+		// const note = notes[Math.floor(Math.random() * notes.length)];
+		togglePlay(notes[12]);
+	}
+	window.addEventListener('keydown', f);
+	window.addEventListener('click', f);
 }
 
-function togglePlay() {
-	if (!didInit) {
-		init();
-	}
+function togglePlay(note) {
 	isPlaying = !isPlaying;
 
 	if (isPlaying) {
-		gainNode.connect(audioCtx.destination);
+		note.gainNode.connect(audioCtx.destination);
 		playPauseSpan.innerHTML = 'pause';
 	} else {
 		setTimeout(() => {
-			gainNode.disconnect(audioCtx.destination);
+			note.gainNode.disconnect(audioCtx.destination);
 		}, decay);
 		playPauseSpan.innerHTML = 'play';
 	}
-	ramp(gainNode.gain, isPlaying);
+	ramp(note, isPlaying);
 }
 
-var isRamping = false;
-function ramp(gain, isUp) {
-	if (isRamping) {
+var isRamping = {};
+function ramp(note, isUp) {
+	if (isRamping[note.id]) {
 		console.log('ramp already in progress');
 	} else {
-		isRamping = true;
+		isRamping[note.id] = true;
 		const startTime = audioCtx.currentTime;
 		const endTime = startTime + (isUp ? attack : decay) / 1000;
 		var val = isUp ? 0 : 1;
@@ -58,10 +66,10 @@ function ramp(gain, isUp) {
 		const intervalId = setInterval(() => {
 			if (audioCtx.currentTime >= endTime) {
 				clearInterval(intervalId);
-				isRamping = false;
+				isRamping[note.id] = false;
 			} else {
 				val += step;
-				gain.value = val;
+				note.gainNode.gain.value = val;
 				// gain.setValueAtTime(val, audioCtx.currentTime);
 				// console.log(isUp, val);
 			}
