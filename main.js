@@ -1,3 +1,6 @@
+const attack = 400;
+const decay = attack;
+
 var isPlaying = false;
 var didInit = false;
 const audioCtx = new AudioContext();
@@ -18,6 +21,7 @@ function init() {
 	oscillator.frequency.value = 400;
 	// oscillator.detune.value = 100; // value in cents
 	oscillator.start(0);
+	gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
 	// gainNode.gain.minValue = volume;
 	// gainNode.gain.maxValue = volume;
 }
@@ -27,16 +31,40 @@ function togglePlay() {
 		init();
 	}
 	isPlaying = !isPlaying;
+
 	if (isPlaying) {
 		gainNode.connect(audioCtx.destination);
-		gainNode.gain.linearRampToValueAtTime(1, audioCtx.currentTime + 0.4);
 		playPauseSpan.innerHTML = 'pause';
 	} else {
-		gainNode.gain.linearRampToValueAtTime(1e-12, audioCtx.currentTime + 0.4);
-		// setTimeout(() => {
-		// 	gainNode.disconnect(audioCtx.destination);
-		// }, 400);
+		setTimeout(() => {
+			gainNode.disconnect(audioCtx.destination);
+		}, decay);
 		playPauseSpan.innerHTML = 'play';
 	}
+	ramp(gainNode.gain, isPlaying);
+}
 
+var isRamping = false;
+function ramp(gain, isUp) {
+	if (isRamping) {
+		console.log('ramp already in progress');
+	} else {
+		isRamping = true;
+		const startTime = audioCtx.currentTime;
+		const endTime = startTime + (isUp ? attack : decay) / 1000;
+		var val = isUp ? 0 : 1;
+		const interval = 20;
+		const step = (isUp ? 1 : -1) * interval / (1000 * (endTime - startTime));
+		const intervalId = setInterval(() => {
+			if (audioCtx.currentTime >= endTime) {
+				clearInterval(intervalId);
+				isRamping = false;
+			} else {
+				val += step;
+				gain.value = val;
+				// gain.setValueAtTime(val, audioCtx.currentTime);
+				// console.log(isUp, val);
+			}
+		}, interval);
+	}
 }
