@@ -3,7 +3,6 @@ const lowFreq = 220;
 const attack = 400;
 const decay = attack;
 
-var isPlaying = false;
 const audioCtx = new AudioContext();
 const notes = [];
 var playPauseSpan;
@@ -33,17 +32,18 @@ function onLoad() {
 			// gainNode.gain.minValue = volume;
 			// gainNode.gain.maxValue = volume;
 		}
-		// const note = notes[Math.floor(Math.random() * notes.length)];
-		togglePlay(notes[12]);
+		const note = notes[Math.floor(Math.random() * notes.length)];
+		togglePlay(note);
 	}
 	window.addEventListener('keydown', f);
 	window.addEventListener('click', f);
 }
 
+const isPlaying = {};
 function togglePlay(note) {
-	isPlaying = !isPlaying;
+	isPlaying[note.id] = !isPlaying[note.id];
 
-	if (isPlaying) {
+	if (isPlaying[note.id]) {
 		note.gainNode.connect(audioCtx.destination);
 		playPauseSpan.innerHTML = 'pause';
 	} else {
@@ -52,10 +52,10 @@ function togglePlay(note) {
 		}, decay);
 		playPauseSpan.innerHTML = 'play';
 	}
-	ramp(note, isPlaying);
+	ramp(note, isPlaying[note.id]);
 }
 
-var isRamping = {};
+const isRamping = {};
 function ramp(note, isUp) {
 	if (isRamping[note.id]) {
 		console.log('ramp already in progress');
