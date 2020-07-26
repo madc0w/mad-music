@@ -11,24 +11,28 @@ var playPauseSpan;
 function onLoad() {
 	playPauseSpan = document.getElementById('play-pause');
 
-	for (var i = 0; i < numNotes; i++) {
-		const gainNode = audioCtx.createGain();
-		const oscillator = audioCtx.createOscillator();
-		oscillator.connect(gainNode);
-		oscillator.frequency.value = lowFreq * Math.pow(2, i / 12);
-		// oscillator.detune.value = 100; // value in cents
-		oscillator.start(0);
-		gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-		notes.push({
-			id: i,
-			oscillator,
-			gainNode,
-		});
-	}
-
-	// gainNode.gain.minValue = volume;
-	// gainNode.gain.maxValue = volume;
+	var didInit = false;
 	function f() {
+		if (!didInit) {
+			didInit = true;
+			for (var i = 0; i < numNotes; i++) {
+				const gainNode = audioCtx.createGain();
+				const oscillator = audioCtx.createOscillator();
+				oscillator.connect(gainNode);
+				oscillator.frequency.value = lowFreq * Math.pow(2, i / 12);
+				// oscillator.detune.value = 100; // value in cents
+				oscillator.start(0);
+				gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+				notes.push({
+					id: i,
+					oscillator,
+					gainNode,
+				});
+			}
+
+			// gainNode.gain.minValue = volume;
+			// gainNode.gain.maxValue = volume;
+		}
 		// const note = notes[Math.floor(Math.random() * notes.length)];
 		togglePlay(notes[12]);
 	}
