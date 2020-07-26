@@ -1,6 +1,9 @@
 const noteNames = [
 	'A3', 'A3#', 'B3', 'C3', 'C3#', 'D3', 'D3#', 'E3', 'F3', 'F3#', 'G3', 'A4', 'A4#', 'B4', 'C4', 'C4#', 'D4', 'D4#', 'E4', 'F4', 'F4#', 'G4',
 ];
+// const noteNames = [
+// 	'A3', 'A3#', 'B3', 'C3', 'C3#', 'D3', 'D3#', 'E3', 'F3',
+// ];
 const lowFreq = 220;
 const attack = 400;
 const decay = attack;
@@ -34,14 +37,14 @@ function onLoad() {
 				});
 			}
 
-			// gainNode.gain.minValue = volume;
-			// gainNode.gain.maxValue = volume;
+			gainNode.gain.minValue = 0;
+			gainNode.gain.maxValue = 1;
 		}
 		const note = notes[Math.floor(Math.random() * notes.length)];
 		togglePlay(note);
 	}
-	window.addEventListener('keydown', f);
-	window.addEventListener('click', f);
+	addEventListener('keydown', f);
+	addEventListener('click', f);
 }
 
 function togglePlay(note) {
