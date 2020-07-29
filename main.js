@@ -1,6 +1,6 @@
 const startSequenceProbability = 0.1;
 const stopSequenceProbability = 0.2;
-const tempo = 400;
+const tempo = 600;
 const noteNames = [
 	'A3', 'A3#', 'B3', 'C3', 'C3#', 'D3', 'D3#', 'E3', 'F3', 'F3#', 'G3', 'A4', 'A4#', 'B4', 'C4', 'C4#', 'D4', 'D4#', 'E4', 'F4', 'F4#', 'G4',
 ];
@@ -8,8 +8,8 @@ const noteNames = [
 // 	'A3', 'A3#', 'B3', 'C3', 'C3#', 'D3', 'D3#', 'E3', 'F3',
 // ];
 const lowFreq = 220;
-const attack = 400;
-const decay = attack;
+const attack = 200;
+const decay = 300;
 
 const audioCtx = new AudioContext();
 const notes = [];
@@ -52,8 +52,8 @@ function onLoad() {
 					oscillator.start(0);
 					gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
 					notes.push({
-						name,
 						id: i,
+						name,
 						oscillator,
 						gainNode,
 					});

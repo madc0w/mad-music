@@ -9,17 +9,19 @@ h1 {
 
 .note {
 	margin-right: 8px;
+	color: #888;
 }
 
 .playing {
 	font-weight: bold;
+	color: #000;
 }
 
 button {
 	cursor: pointer;
 	border: 4px solid #004080;
 	border-radius: 8px;
-	background-color: #ee2;
+	background-color: #dfd;
 	padding: 10px;
 	font-weight: bold;
 	border: 4px solid #004080;
@@ -29,4 +31,14 @@ button {
 #stop-button {
 	position: absolute;
 	top: 100px;
+}
+
+#playing-notes {
+	margin: 8px;
+	background-color: #dfd;
+	padding: 8px;
+	height: 22px;
+	width: 300px;
+	border-radius: 4px;
+	font-size: 22px;
 }
