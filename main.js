@@ -1,6 +1,6 @@
 const startSequenceProbability = 0.24;
 const stopSequenceProbability = 0.04;
-const tempo = 2400;
+const tempo = 1600;
 const lowFreq = 220;
 const attack = 100;
 const decay = 60;
@@ -79,6 +79,7 @@ function ramp(note, isUp) {
 	} else {
 		if (isUp) {
 			note.isPlaying = true;
+			refreshDisplay();
 		}
 		note.isRamping = isUp ? 'up' : 'down';
 		const startTime = audioCtx.currentTime;
@@ -91,12 +92,13 @@ function ramp(note, isUp) {
 				clearInterval(intervalId);
 				if (!isUp) {
 					try {
-						console.log('disconnect ' + note.name);
+						// console.log('disconnect ' + note.name);
 						note.gainNode.disconnect(audioCtx.destination);
 					} catch (err) {
 						console.error(err);
 					}
 					note.isPlaying = false;
+					refreshDisplay();
 				}
 				note.isRamping = null;
 			} else {
