@@ -24,10 +24,9 @@ function start() {
 		return;
 	}
 	didStart = true;
-	var beatNum = 0;
+	var measureNum = 0;
 	setInterval(() => {
-		console.log('beat: ' + beatNum);
-		beatNum++;
+		console.log('measure: ' + ++measureNum);
 		const _notes = [];
 		for (const note of notes) {
 			if (Math.random() > stopSequenceProbability) {
@@ -48,7 +47,7 @@ function start() {
 				gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
 				gainNode.gain.minValue = 0;
 				gainNode.gain.maxValue = 1;
-				const duration = (Math.floor(Math.random() * 7) + 1) / 8;
+				const duration = (Math.ceil(Math.random() * 8)) / 8;
 				notes.push({
 					name,
 					oscillator,
