@@ -47,7 +47,7 @@ function start() {
 				gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
 				gainNode.gain.minValue = 0;
 				gainNode.gain.maxValue = 1;
-				const duration = (Math.ceil(Math.random() * 8)) / 8;
+				const duration = Math.ceil(Math.random() * 8);
 				notes.push({
 					name,
 					oscillator,
@@ -69,18 +69,19 @@ function play(note) {
 	ramp(note, true);
 	setTimeout(() => {
 		ramp(note, false);
-	}, (note.duration * tempo) - decay);
+	}, (note.duration * tempo / 8) - decay - 10);
 }
 
 function ramp(note, isUp) {
-	if (note.isRamping) {
-		console.log('ramp already in progress', note);
+	if (note.ramping) {
+		console.log('ramp already in progress', isUp);
+		console.log(JSON.stringify(note));
 	} else {
 		if (isUp) {
 			note.isPlaying = true;
 			refreshDisplay();
 		}
-		note.isRamping = isUp ? 'up' : 'down';
+		note.ramping = isUp ? 'up' : 'down';
 		const startTime = audioCtx.currentTime;
 		const endTime = startTime + (isUp ? attack : decay) / 1000;
 		var val = isUp ? 0 : 1;
@@ -89,7 +90,8 @@ function ramp(note, isUp) {
 		const intervalId = setInterval(() => {
 			if (audioCtx.currentTime >= endTime) {
 				clearInterval(intervalId);
-				if (!isUp) {
+				note.ramping = null;
+				if (val == 0) {
 					try {
 						// console.log('disconnect ' + note.name);
 						note.gainNode.disconnect(audioCtx.destination);
@@ -99,7 +101,6 @@ function ramp(note, isUp) {
 					note.isPlaying = false;
 					refreshDisplay();
 				}
-				note.isRamping = null;
 			} else {
 				val += step;
 				val = Math.min(Math.max(val, 0), 1);
