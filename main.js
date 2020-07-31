@@ -1,3 +1,4 @@
+const maxNotes = 6;
 const startSequenceProbability = 0.24;
 const stopSequenceProbability = 0.04;
 const tempo = 1600;
@@ -34,7 +35,7 @@ function start() {
 			}
 		}
 		notes = _notes;
-		if (Math.random() < startSequenceProbability) {
+		if (notes.length < maxNotes && Math.random() < startSequenceProbability) {
 			const i = Math.floor(Math.random() * noteNames.length);
 			const name = noteNames[i];
 			if (!notes.find(n => n.name == name)) {
@@ -48,11 +49,13 @@ function start() {
 				gainNode.gain.minValue = 0;
 				gainNode.gain.maxValue = 1;
 				const duration = Math.ceil(Math.random() * 8);
+				const delay = Math.floor(Math.random() * (8 - duration));
 				notes.push({
 					name,
 					oscillator,
 					gainNode,
 					duration,
+					delay,
 				});
 			}
 		}
@@ -64,18 +67,32 @@ function start() {
 }
 
 function play(note) {
-	console.log('playing ' + note.name, note);
-	note.gainNode.connect(audioCtx.destination);
-	ramp(note, true);
 	setTimeout(() => {
-		ramp(note, false);
-	}, (note.duration * tempo / 8) - decay - 10);
+		console.log('playing ' + note.name, note);
+		note.gainNode.connect(audioCtx.destination);
+		ramp(note, true);
+		setTimeout(() => {
+			ramp(note, false);
+		}, (note.duration * tempo / 8) - decay);
+	}, note.delay * tempo / 8);
 }
 
 function ramp(note, isUp) {
+	console.log('ramp ', isUp, note);
 	if (note.ramping) {
-		console.log('ramp already in progress', isUp);
-		console.log(JSON.stringify(note));
+		console.log('ramp already in progress', isUp, note);
+		if (!isUp) {
+			note.gainNode.gain.value = 0;
+			try {
+				// console.log('disconnect ' + note.name);
+				note.gainNode.disconnect(audioCtx.destination);
+			} catch (err) {
+				console.error(err);
+			}
+			note.isPlaying = false;
+			clearInterval(note.intervalId);
+			note.ramping = null;
+		}
 	} else {
 		if (isUp) {
 			note.isPlaying = true;
@@ -87,11 +104,14 @@ function ramp(note, isUp) {
 		var val = isUp ? 0 : 1;
 		const interval = 4;
 		const step = (isUp ? 1 : -1) * interval / (1000 * (endTime - startTime));
-		const intervalId = setInterval(() => {
+		note.intervalId = setInterval(() => {
 			if (audioCtx.currentTime >= endTime) {
-				clearInterval(intervalId);
+				clearInterval(note.intervalId);
 				note.ramping = null;
-				if (val == 0) {
+				// if (!isUp) {
+				// 	console.log('val', val);
+				// }
+				if (val < 1e-12) {
 					try {
 						// console.log('disconnect ' + note.name);
 						note.gainNode.disconnect(audioCtx.destination);
