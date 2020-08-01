@@ -1,6 +1,6 @@
 body {
 	background-color: #0fc;
-	font-family: Arial;
+	font-family: "Lato", sans-serif;
 }
 
 h1 {
@@ -28,9 +28,8 @@ button {
 	box-shadow: 10px 15px 24px 0px rgba(0, 0, 0, 0.4);
 }
 
-#stop-button {
-	position: absolute;
-	top: 100px;
+button:hover {
+	background-color: #cda;
 }
 
 #playing-notes {
@@ -50,4 +49,18 @@ button {
 	vertical-align: top;
 	width: 20px;
 	display: inline-block;
+}
+
+#headline {
+	font-size: 26px;
+
+}
+
+#instructions {
+	margin: 8px;
+	background-color: #dfd;
+	padding: 8px;
+	border: 2px solid #004080;
+	border-radius: 8px;
+	width: 320px;
 }

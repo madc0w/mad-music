@@ -2,7 +2,7 @@ const maxNotes = 6;
 const startSequenceProbability = 0.24;
 const stopSequenceProbability = 0.04;
 const tempo = 1600;
-const lowFreq = 220;
+const lowFreq = 110;
 const attack = 100;
 const decay = 60;
 
