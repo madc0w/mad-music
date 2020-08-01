@@ -154,14 +154,16 @@ function ramp(note, isUp) {
 }
 
 function refreshDisplay() {
-	var html = '';
-	for (const noteId in currSequence) {
-		if (currSequence[noteId]) {
-			const className = playing[noteId] ? 'playing' : '';
-			html += `<span class="note ${className}">`;
-			html += currSequence[noteId].name;
-			html += '</span>';
+	setTimeout(() => {
+		var html = '';
+		for (const noteId in currSequence) {
+			if (currSequence[noteId]) {
+				const className = playing[noteId] ? 'playing' : '';
+				html += `<span class="note ${className}">`;
+				html += currSequence[noteId].name;
+				html += '</span>';
+			}
 		}
-	}
-	playingNotesDiv.innerHTML = html;
+		playingNotesDiv.innerHTML = html;
+	}, 0);
 }

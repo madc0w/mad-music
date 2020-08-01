@@ -59,7 +59,8 @@ function start() {
 				const oscillator = audioCtx.createOscillator();
 				oscillator.connect(gainNode);
 				oscillator.frequency.value = lowFreq * Math.pow(2, i / 12);
-				// oscillator.detune.value = 100; // value in cents
+				// this magically makes things work... no idea why
+				oscillator.detune.value = 100;
 				oscillator.start(0);
 				gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
 				gainNode.gain.minValue = 0;
@@ -99,12 +100,13 @@ function ramp(note, isUp) {
 		console.log('ramp already in progress', isUp, note);
 		if (!isUp) {
 			note.gainNode.gain.value = 0;
-			try {
-				// console.log('disconnect ' + note.name);
-				note.gainNode.disconnect(audioCtx.destination);
-			} catch (err) {
-				console.error(err);
-			}
+			// try {
+			// 	// console.log('disconnect ' + note.name);
+			// 	note.gainNode.disconnect(audioCtx.destination);
+			// 	note.oscillator.disconnect(note.gainNode);
+			// } catch (err) {
+			// 	console.error(err);
+			// }
 			note.isPlaying = false;
 			clearInterval(note.intervalId);
 			note.ramping = null;
@@ -118,7 +120,7 @@ function ramp(note, isUp) {
 		const startTime = audioCtx.currentTime;
 		const endTime = startTime + (isUp ? attack : decay) / 1000;
 		var val = isUp ? 0 : 1;
-		const interval = 4;
+		const interval = 12;
 		const step = (isUp ? 1 : -1) * interval / (1000 * (endTime - startTime));
 		note.intervalId = setInterval(() => {
 			if (audioCtx.currentTime >= endTime) {
@@ -127,13 +129,14 @@ function ramp(note, isUp) {
 				// if (!isUp) {
 				// 	console.log('val', val);
 				// }
-				if (val < 1e-12) {
-					try {
-						// console.log('disconnect ' + note.name);
-						note.gainNode.disconnect(audioCtx.destination);
-					} catch (err) {
-						console.error(err);
-					}
+				if (val < 0.2) {
+					// try {
+					// 	// console.log('disconnect ' + note.name);
+					// 	note.oscillator.disconnect(note.gainNode);
+					// 	// note.gainNode.disconnect(audioCtx.destination);
+					// } catch (err) {
+					// 	console.error(err);
+					// }
 					note.isPlaying = false;
 					refreshDisplay();
 				}
