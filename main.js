@@ -3,8 +3,8 @@ const startSequenceProbability = 0.24;
 const stopSequenceProbability = 0.04;
 const tempo = 1600;
 const lowFreq = 220;
-const attack = 400;
-const decay = 160;
+const attack = 100;
+const decay = 60;
 
 const noteNames = [
 	'A3', 'A3#', 'B3', 'C3', 'C3#', 'D3', 'D3#', 'E3', 'F3', 'F3#', 'G3', 'A4', 'A4#', 'B4', 'C4', 'C4#', 'D4', 'D4#', 'E4', 'F4', 'F4#', 'G4',
@@ -51,7 +51,7 @@ function start() {
 			}
 		}
 		notes = _notes;
-		if (measureNum < 3 || (notes.length < maxNotes && Math.random() < startSequenceProbability)) {
+		if (notes.length < maxNotes && (measureNum < 3 || Math.random() < startSequenceProbability)) {
 			const i = Math.floor(Math.random() * noteNames.length);
 			const name = noteNames[i];
 			if (!notes.find(n => n.name == name)) {
@@ -127,28 +127,27 @@ function ramp(note, isUp) {
 		var val = isUp ? 0 : 1;
 		const interval = 12;
 		const step = (isUp ? 1 : -1) * interval / (1000 * (endTime - startTime));
+		console.log('step', step);
 		note.intervalId = setInterval(() => {
-			if (audioCtx.currentTime >= endTime) {
+			if ((val == 0 && !isUp) || (val == 1 && isUp)) {
 				clearInterval(note.intervalId);
 				note.ramping = null;
-				// if (!isUp) {
-				// 	console.log('val', val);
-				// }
-				if (val < 0.2) {
-					try {
-						// console.log('disconnect ' + note.name);
-						// note.oscillator.disconnect(note.gainNode);
-						note.gainNode.disconnect(audioCtx.destination);
-						note.gainNode.disconnect(note.panNode);
-					} catch (err) {
-						console.error(err);
-					}
+				if (val == 0) {
+					// try {
+					// 	// console.log('disconnect ' + note.name);
+					// 	// note.oscillator.disconnect(note.gainNode);
+					// 	// note.gainNode.disconnect(audioCtx.destination);
+					// 	// note.gainNode.disconnect(note.panNode);
+					// } catch (err) {
+					// 	console.error(err);
+					// }
 					note.isPlaying = false;
 					refreshDisplay();
 				}
 			} else {
 				val += step;
 				val = Math.min(Math.max(val, 0), 1);
+				// console.log('val', val);
 				note.gainNode.gain.value = val;
 				// gain.setValueAtTime(val, audioCtx.currentTime);
 				// console.log(isUp, val);
