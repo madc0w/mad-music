@@ -153,9 +153,9 @@ function ramp(note, isUp) {
 
 function refreshDisplay() {
 	var html = '';
-	html += '<span class="mesure-num">';
+	html += '<div class="mesure-num">';
 	html += measureNum;
-	html += '</span>';
+	html += '</div>';
 	for (const note of notes) {
 		const className = note.isPlaying ? 'playing' : '';
 		html += `<span class="note ${className}">`;
