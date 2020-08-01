@@ -55,13 +55,13 @@ function start() {
 			const i = Math.floor(Math.random() * noteNames.length);
 			const name = noteNames[i];
 			if (!notes.find(n => n.name == name)) {
-				// const panNode = audioCtx.createStereoPanner();
-				// panNode.connect(audioCtx.destination);
-				// panNode.pan.value = Math.random() * 2 - 1;
+				const panNode = audioCtx.createStereoPanner();
+				panNode.connect(audioCtx.destination);
+				panNode.pan.value = Math.random() < 0.5 ? 1 : -1;
 				const gainNode = audioCtx.createGain();
 				const oscillator = audioCtx.createOscillator();
 				oscillator.connect(gainNode);
-				// gainNode.connect(panNode);
+				gainNode.connect(panNode);
 				oscillator.frequency.value = lowFreq * Math.pow(2, i / 12);
 				// this magically makes things work... no idea why
 				oscillator.detune.value = 100;
@@ -69,12 +69,13 @@ function start() {
 				gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
 				gainNode.gain.minValue = 0;
 				gainNode.gain.maxValue = 1;
-				const duration = Math.ceil(Math.random() * 8);
+				const duration = Math.ceil(Math.random() * 4);
 				const delay = Math.floor(Math.random() * (8 - duration));
 				notes.push({
 					name,
 					oscillator,
 					gainNode,
+					panNode,
 					duration,
 					delay,
 				});
@@ -90,7 +91,7 @@ function start() {
 function play(note) {
 	setTimeout(() => {
 		console.log('playing ' + note.name, note);
-		note.gainNode.connect(audioCtx.destination);
+		// note.gainNode.connect(audioCtx.destination);
 		ramp(note, true);
 		setTimeout(() => {
 			ramp(note, false);
@@ -138,6 +139,7 @@ function ramp(note, isUp) {
 						// console.log('disconnect ' + note.name);
 						// note.oscillator.disconnect(note.gainNode);
 						note.gainNode.disconnect(audioCtx.destination);
+						note.gainNode.disconnect(note.panNode);
 					} catch (err) {
 						console.error(err);
 					}
