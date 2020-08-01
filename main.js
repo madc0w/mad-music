@@ -3,20 +3,36 @@ const startSequenceProbability = 0.24;
 const stopSequenceProbability = 0.04;
 const tempo = 1600;
 const lowFreq = 220;
-const attack = 100;
-const decay = 60;
+const attack = 400;
+const decay = 160;
 
 const noteNames = [
 	'A3', 'A3#', 'B3', 'C3', 'C3#', 'D3', 'D3#', 'E3', 'F3', 'F3#', 'G3', 'A4', 'A4#', 'B4', 'C4', 'C4#', 'D4', 'D4#', 'E4', 'F4', 'F4#', 'G4',
 ];
 var notes = [];
 const audioCtx = new AudioContext();
-var playingNotesDiv;
+// const analyser = audioCtx.createAnalyser();
+var playingNotesDiv, stopButton;
+var measureNum = 0;
 
 function onLoad() {
 	playingNotesDiv = document.getElementById('playing-notes');
+	stopButton = document.getElementById('stop-button');
+	stopButton.onclick = () => {
+		for (const note of notes) {
+			note.gainNode.disconnect();
+			note.ramping = null;
+			note.isPlaying = false;
+		}
+		notes = [];
+		refreshDisplay();
+	};
 	addEventListener('keydown', start);
 	addEventListener('click', start);
+
+	// analyser.minDecibels = -90;
+	// analyser.maxDecibels = -10;
+	// analyser.smoothingTimeConstant = 0.85;
 }
 
 var didStart = false;
@@ -25,9 +41,9 @@ function start() {
 		return;
 	}
 	didStart = true;
-	var measureNum = 0;
 	setInterval(() => {
 		console.log('measure: ' + ++measureNum);
+		refreshDisplay();
 		const _notes = [];
 		for (const note of notes) {
 			if (Math.random() > stopSequenceProbability) {
@@ -35,7 +51,7 @@ function start() {
 			}
 		}
 		notes = _notes;
-		if (notes.length < maxNotes && Math.random() < startSequenceProbability) {
+		if (measureNum < 3 || (notes.length < maxNotes && Math.random() < startSequenceProbability)) {
 			const i = Math.floor(Math.random() * noteNames.length);
 			const name = noteNames[i];
 			if (!notes.find(n => n.name == name)) {
@@ -134,6 +150,9 @@ function ramp(note, isUp) {
 
 function refreshDisplay() {
 	var html = '';
+	html += '<span class="mesure-num">';
+	html += measureNum;
+	html += '</span>';
 	for (const note of notes) {
 		const className = note.isPlaying ? 'playing' : '';
 		html += `<span class="note ${className}">`;

@@ -1,13 +1,13 @@
-const startSequenceProbability = 0.2;
-const stopSequenceProbability = 0.12;
-const tempo = 2000;
+const startSequenceProbability = 0.5;
+const stopSequenceProbability = 0.3;
+const tempo = 1200;
 const noteNames = [
 	'A3', 'A3#', 'B3', 'C3', 'C3#', 'D3', 'D3#', 'E3', 'F3', 'F3#', 'G3', 'A4', 'A4#', 'B4', 'C4', 'C4#', 'D4', 'D4#', 'E4', 'F4', 'F4#', 'G4',
 ];
 // const noteNames = [
 // 	'A3', 'A3#', 'B3', 'C3', 'C3#', 'D3', 'D3#', 'E3', 'F3',
 // ];
-const lowFreq = 220;
+const lowFreq = 110;
 const attack = tempo / 12;
 const decay = tempo / 10;
 
