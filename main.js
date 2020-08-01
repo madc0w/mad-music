@@ -1,10 +1,10 @@
 const maxNotes = 6;
 const startSequenceProbability = 0.3;
-const stopSequenceProbability = 0.12;
+const stopSequenceProbability = 0.08;
 const tempo = 1600;
-const lowFreq = 110;
 const attack = 100;
 const decay = 60;
+const lowFreq = 110;
 
 const noteNames = [
 	'A3', 'A3#', 'B3', 'C3', 'C3#', 'D3', 'D3#', 'E3', 'F3', 'F3#', 'G3', 'A4', 'A4#', 'B4', 'C4', 'C4#', 'D4', 'D4#', 'E4', 'F4', 'F4#', 'G4',
@@ -51,7 +51,7 @@ function start() {
 			}
 		}
 		notes = _notes;
-		if (notes.length < maxNotes && (measureNum < 3 || Math.random() < startSequenceProbability)) {
+		if (notes.length < maxNotes && (notes.length < 2 || Math.random() < startSequenceProbability)) {
 			const i = Math.floor(Math.random() * noteNames.length);
 			const name = noteNames[i];
 			if (!notes.find(n => n.name == name)) {
@@ -125,7 +125,7 @@ function ramp(note, isUp) {
 		const startTime = audioCtx.currentTime;
 		const endTime = startTime + (isUp ? attack : decay) / 1000;
 		var val = isUp ? 0 : 1;
-		const interval = 12;
+		const interval = 4;
 		const step = (isUp ? 1 : -1) * interval / (1000 * (endTime - startTime));
 		console.log('step', step);
 		note.intervalId = setInterval(() => {
