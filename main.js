@@ -55,9 +55,13 @@ function start() {
 			const i = Math.floor(Math.random() * noteNames.length);
 			const name = noteNames[i];
 			if (!notes.find(n => n.name == name)) {
+				const panNode = audioCtx.createStereoPanner();
+				panNode.connect(audioCtx.destination);
+				panNode.pan.value = Math.random() * 2 - 1;
 				const gainNode = audioCtx.createGain();
 				const oscillator = audioCtx.createOscillator();
 				oscillator.connect(gainNode);
+				gainNode.connect(panNode);
 				oscillator.frequency.value = lowFreq * Math.pow(2, i / 12);
 				// this magically makes things work... no idea why
 				oscillator.detune.value = 100;
