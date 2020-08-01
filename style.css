@@ -32,6 +32,11 @@ button:hover {
 	background-color: #cda;
 }
 
+#stop-button {
+	margin-left: 80px;
+	margin-top: 10px;
+}
+
 #playing-notes {
 	margin: 8px;
 	background-color: #dfd;
