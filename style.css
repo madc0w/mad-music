@@ -69,3 +69,16 @@ button:hover {
 	border-radius: 8px;
 	width: 320px;
 }
+
+#links li {
+	margin-top: 8px;
+}
+
+#links a {
+	text-decoration: none;
+	color: #00c;
+}
+
+#links a:hover {
+	color: #0a0;
+}
