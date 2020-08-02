@@ -1,4 +1,4 @@
-const tempo = 1600;
+const tempo = 1200;
 const attack = 100;
 const decay = 60;
 const lowFreq = 110;

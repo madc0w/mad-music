@@ -25,7 +25,7 @@ function start() {
 			const name = noteNames[i];
 			if (!notes.find(n => n.name == name)) {
 				const panNode = audioCtx.createStereoPanner();
-				panNode.pan.value = Math.random() < 0.5 ? 1 : -1;
+				panNode.pan.value = Math.random() * 2 - 1;
 				const gainNode = audioCtx.createGain();
 				const oscillator = audioCtx.createOscillator();
 				oscillator.connect(gainNode);

@@ -24,7 +24,7 @@ function start() {
 				// } while (noteNames[i].endsWith('#'));
 				const name = noteNames[i];
 				const panNode = audioCtx.createStereoPanner();
-				panNode.pan.value = Math.random() < 0.5 ? 1 : -1;
+				panNode.pan.value = Math.random() * 2 - 1;
 				const gainNode = audioCtx.createGain();
 				const oscillator = audioCtx.createOscillator();
 				oscillator.connect(gainNode);
@@ -33,7 +33,7 @@ function start() {
 				oscillator.frequency.value = lowFreq * Math.pow(2, i / 12);
 				setRandomWave(oscillator);
 				// this magically makes things work... no idea why
-				oscillator.detune.value = 100;
+				oscillator.detune.value = 1;
 				oscillator.start(0);
 				gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
 				gainNode.gain.minValue = 0;
