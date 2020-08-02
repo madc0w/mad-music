@@ -1,5 +1,6 @@
-const phraseGenerationProb = 0.12;
+const phraseGenerationProb = 0.4;
 const phraseDestructionProb = 0.1;
+const maxPhrases = 4;
 const phrases = [];
 
 function onLoad() {
@@ -16,11 +17,14 @@ function start() {
 	didStart = true;
 	setInterval(() => {
 		console.log('measure: ' + ++measureNum);
-		if (phrases.length < 1 || Math.random() < phraseGenerationProb) {
+		if (phrases.length < 1 || (phrases.length < maxPhrases && Math.random() < phraseGenerationProb)) {
 			var totalDuration = 0;
 			const phrase = [];
 			do {
-				const i = Math.floor(Math.random() * noteNames.length);
+				var i;
+				do {
+					i = Math.floor(Math.random() * noteNames.length);
+				} while (noteNames[i].endsWith('#'));
 				const name = noteNames[i];
 				const panNode = audioCtx.createStereoPanner();
 				panNode.pan.value = Math.random() < 0.5 ? 1 : -1;
