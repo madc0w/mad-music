@@ -2,7 +2,7 @@ const phraseGenerationProb = 0.4;
 const phraseDestructionProb = 0.1;
 const maxPhrases = 4;
 
-const phrases = [];
+var phrases = [];
 var phrase;
 
 var didStart = false;
@@ -88,4 +88,5 @@ function refreshDisplay() {
 }
 
 function stop() {
+	phrases = [];
 }
