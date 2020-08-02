@@ -88,5 +88,6 @@ function refreshDisplay() {
 }
 
 function stop() {
+	measureNum = 1;
 	phrases = [];
 }
