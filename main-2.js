@@ -1,13 +1,9 @@
 const phraseGenerationProb = 0.4;
 const phraseDestructionProb = 0.1;
 const maxPhrases = 4;
+
 const phrases = [];
-
-function onLoad() {
-	addEventListener('keydown', start);
-	addEventListener('click', start);
-
-}
+var phrase;
 
 var didStart = false;
 function start() {
@@ -21,10 +17,11 @@ function start() {
 			var totalDuration = 0;
 			const phrase = [];
 			do {
-				var i;
-				do {
-					i = Math.floor(Math.random() * noteNames.length);
-				} while (noteNames[i].endsWith('#'));
+				const i = Math.floor(Math.random() * noteNames.length);
+				// var i;
+				// do {
+				// 	i = Math.floor(Math.random() * noteNames.length);
+				// } while (noteNames[i].endsWith('#'));
 				const name = noteNames[i];
 				const panNode = audioCtx.createStereoPanner();
 				panNode.pan.value = Math.random() < 0.5 ? 1 : -1;
@@ -63,7 +60,8 @@ function start() {
 			}
 		}
 
-		const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+		phrase = phrases[Math.floor(Math.random() * phrases.length)];
+		refreshDisplay();
 		var delay = 0;
 		for (const note of phrase) {
 			// console.log('delay', delay);
@@ -76,15 +74,18 @@ function start() {
 }
 
 function refreshDisplay() {
-	// var html = '';
-	// html += '<div class="mesure-num">';
-	// html += measureNum;
-	// html += '</div>';
-	// for (const note of notes) {
-	// 	const className = note.isPlaying ? 'playing' : '';
-	// 	html += `<span class="note ${className}">`;
-	// 	html += note.name;
-	// 	html += '</span>';
-	// }
-	// playingNotesDiv.innerHTML = html;
+	var html = '';
+	html += '<div class="mesure-num">';
+	html += measureNum;
+	html += '</div>';
+	for (const note of phrase) {
+		const className = note.isPlaying ? 'playing' : '';
+		html += `<span class="note ${className}">`;
+		html += note.name;
+		html += '</span>';
+	}
+	playingNotesDiv.innerHTML = html;
+}
+
+function stop() {
 }

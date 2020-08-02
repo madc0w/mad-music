@@ -3,28 +3,6 @@ const startSequenceProbability = 0.6;
 const stopSequenceProbability = 0.12;
 
 var notes = [];
-// const analyser = audioCtx.createAnalyser();
-var playingNotesDiv, stopButton;
-
-function onLoad() {
-	playingNotesDiv = document.getElementById('playing-notes');
-	stopButton = document.getElementById('stop-button');
-	stopButton.onclick = () => {
-		for (const note of notes) {
-			note.gainNode.disconnect();
-			note.ramping = null;
-			note.isPlaying = false;
-		}
-		notes = [];
-		refreshDisplay();
-	};
-	addEventListener('keydown', start);
-	addEventListener('click', start);
-
-	// analyser.minDecibels = -90;
-	// analyser.maxDecibels = -10;
-	// analyser.smoothingTimeConstant = 0.85;
-}
 
 var didStart = false;
 function start() {
@@ -92,4 +70,13 @@ function refreshDisplay() {
 		html += '</span>';
 	}
 	playingNotesDiv.innerHTML = html;
+}
+
+function stop() {
+	for (const note of notes) {
+		note.gainNode.disconnect();
+		note.ramping = null;
+		note.isPlaying = false;
+	}
+	notes = [];
 }
