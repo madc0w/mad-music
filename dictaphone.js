@@ -20,7 +20,9 @@ const canvasCtx = canvas.getContext('2d');
 if (navigator.mediaDevices.getUserMedia) {
 	console.log('getUserMedia supported.');
 
-	const constraints = { audio: true };
+	const constraints = {
+		audio: true
+	};
 	let chunks = [];
 
 	let onSuccess = function (stream) {
@@ -53,7 +55,7 @@ if (navigator.mediaDevices.getUserMedia) {
 		mediaRecorder.onstop = function (e) {
 			console.log('data available after MediaRecorder.stop() called.');
 
-			const clipName = prompt('Enter a name for your sound clip?', 'My unnamed clip');
+			const clipName = prompt('Enter a name for your sound clip:', 'Unnamed clip');
 
 			const clipContainer = document.createElement('article');
 			const clipLabel = document.createElement('p');
@@ -65,11 +67,7 @@ if (navigator.mediaDevices.getUserMedia) {
 			deleteButton.textContent = 'Delete';
 			deleteButton.className = 'delete';
 
-			if (clipName === null) {
-				clipLabel.textContent = 'My unnamed clip';
-			} else {
-				clipLabel.textContent = clipName;
-			}
+			clipLabel.textContent = clipName || 'Unnamed clip';
 
 			clipContainer.appendChild(audio);
 			clipContainer.appendChild(clipLabel);
@@ -77,7 +75,9 @@ if (navigator.mediaDevices.getUserMedia) {
 			soundClips.appendChild(clipContainer);
 
 			audio.controls = true;
-			const blob = new Blob(chunks, { 'type': 'audio/ogg; codecs=opus' });
+			const blob = new Blob(chunks, {
+				type: 'audio/ogg; codecs=opus'
+			});
 			chunks = [];
 			const audioURL = window.URL.createObjectURL(blob);
 			audio.src = audioURL;
@@ -90,12 +90,8 @@ if (navigator.mediaDevices.getUserMedia) {
 
 			clipLabel.onclick = function () {
 				const existingName = clipLabel.textContent;
-				const newClipName = prompt('Enter a new name for your sound clip?');
-				if (newClipName === null) {
-					clipLabel.textContent = existingName;
-				} else {
-					clipLabel.textContent = newClipName;
-				}
+				const newClipName = prompt('Enter a new name for your sound clip:');
+				clipLabel.textContent = newClipName || existingName;
 			}
 		}
 
@@ -115,12 +111,8 @@ if (navigator.mediaDevices.getUserMedia) {
 }
 
 function visualize(stream) {
-	if (!audioCtx) {
-		audioCtx = new AudioContext();
-	}
-
+	audioCtx = audioCtx || new AudioContext();
 	const source = audioCtx.createMediaStreamSource(stream);
-
 	const analyser = audioCtx.createAnalyser();
 	analyser.fftSize = 2048;
 	const bufferLength = analyser.frequencyBinCount;
@@ -129,7 +121,7 @@ function visualize(stream) {
 	source.connect(analyser);
 	//analyser.connect(audioCtx.destination);
 
-	draw()
+	draw();
 
 	function draw() {
 		const WIDTH = canvas.width
@@ -146,13 +138,9 @@ function visualize(stream) {
 		canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
 
 		canvasCtx.beginPath();
-
-		let sliceWidth = WIDTH * 1.0 / bufferLength;
+		let sliceWidth = WIDTH / bufferLength;
 		let x = 0;
-
-
 		for (let i = 0; i < bufferLength; i++) {
-
 			let v = dataArray[i] / 128.0;
 			let y = v * HEIGHT / 2;
 
@@ -167,7 +155,6 @@ function visualize(stream) {
 
 		canvasCtx.lineTo(canvas.width, canvas.height / 2);
 		canvasCtx.stroke();
-
 	}
 }
 
