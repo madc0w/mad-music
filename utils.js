@@ -22,9 +22,17 @@ function onLoad() {
 		stop();
 		refreshDisplay();
 	};
-
 }
 
+var didStart = false;
+function start() {
+	if (didStart) {
+		return;
+	}
+	didStart = true;
+	setInterval(loop, tempo);
+	loop();
+}
 
 function play(note, done) {
 	setTimeout(() => {
