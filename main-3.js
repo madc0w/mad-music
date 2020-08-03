@@ -11,6 +11,7 @@ function init() {
 	request.onload = () => {
 		audioCtx.decodeAudioData(request.response, buffer => {
 			buff = buffer;
+			playSound(buff);
 		}, err => {
 			console.error(err);
 		});
@@ -18,6 +19,14 @@ function init() {
 	request.send();
 }
 
+
+function playSound(buffer) {
+	const source = context.createBufferSource(); // creates a sound source
+	source.buffer = buffer;                    // tell the source which sound to play
+	source.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
+	source.start(0);                           // play the source now
+	// note: on older systems, may have to use deprecated noteOn(time);
+}
 function loop() {
 
 }
