@@ -2,7 +2,8 @@ var buff = null;
 
 function init() {
 	const request = new XMLHttpRequest();
-	request.open('GET', 'http://heliosophiclabs.com/~mad/projects/mad-music/non.mp3', true);
+	// request.open('GET', 'http://heliosophiclabs.com/~mad/projects/mad-music/non.mp3', true);
+	request.open('GET', 'non.mp3', true);
 	request.responseType = 'arraybuffer';
 	request.onload = () => {
 		audioCtx.decodeAudioData(request.response, buffer => {
