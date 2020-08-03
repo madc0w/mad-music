@@ -1,9 +1,5 @@
 var buff = null;
 
-function setup() {
-	console.log('setup');
-}
-
 function init() {
 	const request = new XMLHttpRequest();
 	request.open('GET', 'http://heliosophiclabs.com/~mad/projects/mad-music/non.mp3', true);
@@ -11,7 +7,6 @@ function init() {
 	request.onload = () => {
 		audioCtx.decodeAudioData(request.response, buffer => {
 			buff = buffer;
-			playSound(buff);
 		}, err => {
 			console.error(err);
 		});
@@ -28,5 +23,5 @@ function playSound(buffer) {
 	// note: on older systems, may have to use deprecated noteOn(time);
 }
 function loop() {
-	//
+	playSound(buff);
 }
