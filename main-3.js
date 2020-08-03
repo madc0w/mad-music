@@ -37,6 +37,32 @@ function init() {
 
 
 function loop() {
+
+	const source = audioCtx.createBufferSource();
+	source.buffer = buff;
+
+	const analyser = audioCtx.createAnalyser();
+	analyser.connect(audioCtx.destination);
+	analyser.minDecibels = -140;
+	analyser.maxDecibels = 0;
+	analyser.smoothingTimeConstant = 0.8;
+	analyser.fftSize = 2048;
+	// const dataArray = new Float32Array(analyser.frequencyBinCount);
+	const dataArray = new Uint8Array(analyser.frequencyBinCount);
+	source.connect(analyser);
+	analyser.connect(audioCtx.destination);
+	source.start(0);
+	setTimeout(() => {
+		analyser.getByteFrequencyData(dataArray);
+		// analyser.getFloatFrequencyData(dataArray);
+		console.log('dataArray', dataArray);
+		// for (var i = 0; i < analyser.frequencyBinCount; i++) {
+		// 	const value = dataArray[i];
+		// 	console.log(value);
+		// }
+	}, 200);
+	return;
+
 	console.log('measure: ' + ++measureNum);
 	if (phrases.length < 1 || (phrases.length < maxPhrases && Math.random() < phraseGenerationProb)) {
 		var totalDuration = 0;
