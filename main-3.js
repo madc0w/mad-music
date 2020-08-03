@@ -9,11 +9,15 @@ function init() {
 	request.open('GET', 'http://heliosophiclabs.com/~mad/projects/mad-music/non.mp3', true);
 	request.responseType = 'arraybuffer';
 	request.onload = () => {
-		context.decodeAudioData(request.response, buffer => {
+		audioContext.decodeAudioData(request.response, buffer => {
 			buff = buffer;
 		}, err => {
 			console.error(err);
 		});
 	}
 	request.send();
+}
+
+function loop() {
+
 }
