@@ -1,6 +1,6 @@
-const tempo = 1200;
-const attack = 100;
-const decay = 60;
+const tempo = 2000;
+const attack = 0.6;
+const decay = 0.3;
 const lowFreq = 110;
 const numWaveCompnents = 6;
 
@@ -33,8 +33,8 @@ function play(note, done) {
 		ramp(note, true);
 		setTimeout(() => {
 			ramp(note, false, done);
-		}, (note.duration * tempo / 8) - decay);
-	}, note.delay * tempo / 8);
+		}, (note.duration * tempo / 16) - decay);
+	}, note.delay * tempo / 16);
 }
 
 function ramp(note, isUp, done) {
@@ -42,7 +42,7 @@ function ramp(note, isUp, done) {
 	if (note.ramping) {
 		console.log('ramp already in progress', isUp, note);
 		if (!isUp) {
-			note.gainNode.gain.value = 0;
+			// note.gainNode.gain.value = 0;
 			// try {
 			// 	// console.log('disconnect ' + note.name);
 			// 	note.gainNode.disconnect(audioCtx.destination);
@@ -50,51 +50,50 @@ function ramp(note, isUp, done) {
 			// } catch (err) {
 			// 	console.error(err);
 			// }
-			note.isPlaying = false;
+			// note.isPlaying = false;
+			clearInterval(note.intervalId);
+			// note.ramping = null;
+		}
+	}
+	if (isUp) {
+		note.isPlaying = true;
+		refreshDisplay();
+	}
+	note.ramping = isUp ? 'up' : 'down';
+	const startTime = audioCtx.currentTime;
+	const endTime = startTime + (note.duration * tempo / 16) * (isUp ? attack : decay) / 1000;
+	var val = isUp ? 0 : 1;
+	const interval = 4;
+	const step = (isUp ? 1 : -1) * interval / (1000 * (endTime - startTime));
+	// console.log('step', step);
+	note.intervalId = setInterval(() => {
+		if ((val == 0 && !isUp) || (val == 1 && isUp)) {
 			clearInterval(note.intervalId);
 			note.ramping = null;
-		}
-	} else {
-		if (isUp) {
-			note.isPlaying = true;
-			refreshDisplay();
-		}
-		note.ramping = isUp ? 'up' : 'down';
-		const startTime = audioCtx.currentTime;
-		const endTime = startTime + (isUp ? attack : decay) / 1000;
-		var val = isUp ? 0 : 1;
-		const interval = 4;
-		const step = (isUp ? 1 : -1) * interval / (1000 * (endTime - startTime));
-		// console.log('step', step);
-		note.intervalId = setInterval(() => {
-			if ((val == 0 && !isUp) || (val == 1 && isUp)) {
-				clearInterval(note.intervalId);
-				note.ramping = null;
-				if (val == 0) {
-					// try {
-					// 	// console.log('disconnect ' + note.name);
-					// 	// note.oscillator.disconnect(note.gainNode);
-					// 	// note.gainNode.disconnect(audioCtx.destination);
-					// 	// note.gainNode.disconnect(note.panNode);
-					// } catch (err) {
-					// 	console.error(err);
-					// }
-					note.isPlaying = false;
-					refreshDisplay();
-				}
-				if (done) {
-					done();
-				}
-			} else {
-				val += step;
-				val = Math.min(Math.max(val, 0), 1);
-				// console.log('val', val);
-				note.gainNode.gain.value = val;
-				// gain.setValueAtTime(val, audioCtx.currentTime);
-				// console.log(isUp, val);
+			if (val == 0) {
+				// try {
+				// 	// console.log('disconnect ' + note.name);
+				// 	// note.oscillator.disconnect(note.gainNode);
+				// 	// note.gainNode.disconnect(audioCtx.destination);
+				// 	// note.gainNode.disconnect(note.panNode);
+				// } catch (err) {
+				// 	console.error(err);
+				// }
+				note.isPlaying = false;
+				refreshDisplay();
 			}
-		}, interval);
-	}
+			if (done) {
+				done();
+			}
+		} else {
+			val += step;
+			val = Math.min(Math.max(val, 0), 1);
+			// console.log('val', val);
+			note.gainNode.gain.value = val;
+			// gain.setValueAtTime(val, audioCtx.currentTime);
+			// console.log(isUp, val);
+		}
+	}, interval);
 }
 
 

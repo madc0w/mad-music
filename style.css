@@ -33,7 +33,7 @@ button:hover {
 }
 
 #stop-button {
-	margin-left: 80px;
+	margin-left: 100px;
 	margin-top: 10px;
 }
 
@@ -42,7 +42,7 @@ button:hover {
 	background-color: #dfd;
 	padding: 8px;
 	height: 22px;
-	width: 320px;
+	width: 360px;
 	border-radius: 4px;
 	font-size: 22px;
 }
@@ -67,7 +67,7 @@ button:hover {
 	padding: 8px;
 	border: 2px solid #004080;
 	border-radius: 8px;
-	width: 320px;
+	width: 360px;
 }
 
 #links li {

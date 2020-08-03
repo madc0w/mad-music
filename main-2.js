@@ -40,8 +40,8 @@ function start() {
 				gainNode.gain.maxValue = 1;
 				var duration;
 				do {
-					duration = Math.ceil(Math.random() * 4);
-				} while (totalDuration + tempo * duration / 8 > tempo);
+					duration = Math.ceil(Math.random() * 8);
+				} while (totalDuration + tempo * duration / 16 > tempo);
 				phrase.push({
 					name,
 					oscillator,
@@ -50,7 +50,7 @@ function start() {
 					duration,
 					delay: 0,
 				});
-				totalDuration += tempo * duration / 8;
+				totalDuration += tempo * duration / 16;
 			} while (totalDuration < tempo);
 
 			phrases.push(phrase);
@@ -68,7 +68,7 @@ function start() {
 			setTimeout(() => {
 				play(note);
 			}, delay);
-			delay += tempo * note.duration / 8;
+			delay += tempo * note.duration / 16;
 		}
 	}, tempo);
 }

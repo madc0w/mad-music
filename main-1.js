@@ -39,8 +39,8 @@ function start() {
 				gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
 				gainNode.gain.minValue = 0;
 				gainNode.gain.maxValue = 1;
-				const duration = Math.ceil(Math.random() * 4);
-				const delay = Math.floor(Math.random() * (8 - duration));
+				const duration = Math.ceil(Math.random() * 8);
+				const delay = Math.floor(Math.random() * (16 - duration));
 				notes.push({
 					name,
 					oscillator,
