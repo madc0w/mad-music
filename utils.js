@@ -22,6 +22,7 @@ function onLoad() {
 		stop();
 		refreshDisplay();
 	};
+	init();
 }
 
 var didStart = false;
@@ -32,6 +33,9 @@ function start() {
 	didStart = true;
 	setInterval(loop, tempo);
 	loop();
+}
+
+function init() {
 }
 
 function play(note, done) {
