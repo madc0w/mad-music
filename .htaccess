@@ -1,4 +1,5 @@
 Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Expose-Headers: access-control-allow-origin
 
 AddType application/x-web-app-manifest+json .webapp
 AddType video/mp3 .mp3
