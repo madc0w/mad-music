@@ -28,6 +28,8 @@ function init() {
 	request.onload = () => {
 		audioCtx.decodeAudioData(request.response, buffer => {
 			buff = buffer;
+
+			console.log('length', buff.length / audioCtx.sampleRate);
 		}, err => {
 			console.error(err);
 		});
