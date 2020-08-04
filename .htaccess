@@ -1,3 +1,5 @@
+Header set Access-Control-Allow-Origin "*"
+
 AddType application/x-web-app-manifest+json .webapp
 AddType video/mp3 .mp3
 AddType video/ogg .ogv
