@@ -1,6 +1,4 @@
 Header set Access-Control-Allow-Origin "*"
-Header set Access-Control-Allow-Headers "Origin, Accept, X-Requested-With, Content-Type, If-Modified-Since"
-Header set Access-Control-Allow-Methods "GET, OPTIONS, HEAD"
 
 AddType application/x-web-app-manifest+json .webapp
 AddType video/mp3 .mp3
