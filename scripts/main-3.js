@@ -5,8 +5,7 @@ const maxPhrases = 4;
 var phrases = [];
 var phrase;
 
-var buff = null;
-// const proxyUrl = location.origin == 'file://' ? 'https://cors-anywhere.herokuapp.com/' : '';
+var clipNum = 0;
 
 function init() {
 	// const request = new XMLHttpRequest();
@@ -25,9 +24,6 @@ function init() {
 
 	const toggleRecordingButton = document.getElementById('toggle-recording');
 	const soundClips = document.getElementById('sound-clips');
-	const constraints = {
-		audio: true
-	};
 	let chunks = [];
 
 	var startTime, recordingTime;
@@ -40,27 +36,19 @@ function init() {
 			if (isRecording) {
 				startTime = new Date();
 				mediaRecorder.start();
-				console.log(mediaRecorder.state);
-				console.log('recorder started');
 				toggleRecordingButton.style.background = 'red';
 				toggleRecordingButton.innerText = 'Stop';
 			} else {
 				recordingTime = new Date() - startTime;
 				mediaRecorder.stop();
-				console.log(mediaRecorder.state);
-				console.log('recorder stopped. time: ', recordingTime);
 				toggleRecordingButton.style.background = '';
 				toggleRecordingButton.style.color = '';
 				toggleRecordingButton.innerText = 'Record';
-				// mediaRecorder.requestData();
 			}
 		}
 
 		mediaRecorder.onstop = () => {
-			console.log('data available after MediaRecorder.stop() called.');
-
-			const clipName = prompt('Enter a name for your sound clip:', 'Unnamed clip');
-
+			clipNum++;
 			const clipContainer = document.createElement('article');
 			const clipLabel = document.createElement('p');
 			const audio = document.createElement('audio');
@@ -70,9 +58,7 @@ function init() {
 			audio.setAttribute('controls', '');
 			deleteButton.textContent = 'Delete';
 			deleteButton.className = 'delete-recording';
-
-			clipLabel.textContent = clipName || 'Unnamed clip';
-
+			clipLabel.textContent = `Clip ${clipNum}`;
 			clipContainer.appendChild(audio);
 			clipContainer.appendChild(deleteButton);
 			clipContainer.appendChild(clipLabel);
@@ -85,8 +71,6 @@ function init() {
 			chunks = [];
 			const audioURL = window.URL.createObjectURL(blob);
 			audio.src = audioURL;
-			console.log('recorder stopped');
-
 			blob.arrayBuffer().then(recordedBuffer => {
 				const source = audioCtx.createBufferSource();
 				audioCtx.decodeAudioData(recordedBuffer, decodedData => {
@@ -104,11 +88,6 @@ function init() {
 				let evtTgt = e.target;
 				evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
 			}
-
-			clipLabel.onclick = () => {
-				const newClipName = prompt('Enter a new name for your sound clip:');
-				clipLabel.textContent = newClipName || clipLabel.textContent;
-			}
 		}
 
 		mediaRecorder.ondataavailable = e => {
@@ -116,36 +95,11 @@ function init() {
 		}
 	}
 
-	navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, err => {
+	navigator.mediaDevices.getUserMedia({
+		audio: true
+	}).then(onSuccess, err => {
 		alert(err);
 	});
-
-}
-
-function initLoop() {
-	const source = audioCtx.createBufferSource();
-	source.buffer = buff;
-
-	// const analyser = audioCtx.createAnalyser();
-	// analyser.connect(audioCtx.destination);
-	// analyser.minDecibels = -140;
-	// analyser.maxDecibels = 0;
-	// analyser.smoothingTimeConstant = 0.8;
-	// analyser.fftSize = 2048;
-	// // const dataArray = new Float32Array(analyser.frequencyBinCount);
-	// const dataArray = new Uint8Array(analyser.frequencyBinCount);
-	// source.connect(analyser);
-	// analyser.connect(audioCtx.destination);
-	// source.start(0);
-	// setTimeout(() => {
-	// 	analyser.getByteFrequencyData(dataArray);
-	// 	// analyser.getFloatFrequencyData(dataArray);
-	// 	console.log('dataArray', dataArray);
-	// 	// for (var i = 0; i < analyser.frequencyBinCount; i++) {
-	// 	// 	const value = dataArray[i];
-	// 	// 	console.log(value);
-	// 	// }
-	// }, 200);
 }
 
 function loop() {
