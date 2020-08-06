@@ -7,7 +7,7 @@ var phrase;
 var goButton;
 
 var clipNum = 0;
-var buffer;
+var buffers = [];
 
 function onLoad() {
 	playingNotesDiv = document.getElementById('playing-notes');
@@ -92,10 +92,9 @@ function init() {
 			const audioURL = window.URL.createObjectURL(blob);
 			audio.src = audioURL;
 			blob.arrayBuffer().then(recordedBuffer => {
-				const source = audioCtx.createBufferSource();
 				audioCtx.decodeAudioData(recordedBuffer, decodedData => {
 					goButton.disabled = false;
-					buffer = decodedData;
+					buffers.push(decodedData);
 				});
 			});
 
@@ -163,9 +162,9 @@ function loop() {
 		setTimeout(() => {
 			const source = audioCtx.createBufferSource();
 			source.detune.value = note.detune;
-			source.buffer = buffer;
+			source.buffer = buffers[Math.floor(Math.random() * buffers.length)];
 			source.connect(note.panNode);
-			source.start(0);
+			source.start();
 			note.isPlaying = true;
 			if (prevNote) {
 				prevNote.isPlaying = false;
