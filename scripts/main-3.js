@@ -4,8 +4,28 @@ const maxPhrases = 4;
 
 var phrases = [];
 var phrase;
+var goButton;
 
 var clipNum = 0;
+var buffer;
+
+function onLoad() {
+	playingNotesDiv = document.getElementById('playing-notes');
+	stopButton = document.getElementById('stop-button');
+	goButton = document.getElementById('go-button');
+	goButton.disabled = true;
+
+	stopButton.onclick = () => {
+		stop();
+		refreshDisplay();
+	};
+	goButton.onclick = () => {
+		start();
+	};
+
+	init();
+}
+
 
 function init() {
 	// const request = new XMLHttpRequest();
@@ -74,13 +94,8 @@ function init() {
 			blob.arrayBuffer().then(recordedBuffer => {
 				const source = audioCtx.createBufferSource();
 				audioCtx.decodeAudioData(recordedBuffer, decodedData => {
-					const inData = decodedData.getChannelData(0);
-					const shiftAmount = 0.75;
-					const outData = PitchShift(shiftAmount, inData.length, 1024, 10, audioCtx.sampleRate, inData);
-					decodedData.copyToChannel(outData, 0);
-					source.buffer = decodedData;
-					source.connect(audioCtx.destination);
-					source.start(0);
+					goButton.disabled = false;
+					buffer = decodedData;
 				});
 			});
 
@@ -103,64 +118,64 @@ function init() {
 }
 
 function loop() {
-	// console.log('measure: ' + ++measureNum);
-	// if (phrases.length < 1 || (phrases.length < maxPhrases && Math.random() < phraseGenerationProb)) {
-	// 	var totalDuration = 0;
-	// 	const phrase = [];
-	// 	do {
-	// 		const i = Math.floor(Math.random() * noteNames.length);
-	// 		// var i;
-	// 		// do {
-	// 		// 	i = Math.floor(Math.random() * noteNames.length);
-	// 		// } while (noteNames[i].endsWith('#'));
-	// 		const name = noteNames[i];
-	// 		const panNode = audioCtx.createStereoPanner();
-	// 		panNode.pan.value = Math.random() * 2 - 1;
-	// 		panNode.connect(audioCtx.destination);
+	console.log('measure: ' + ++measureNum);
+	if (phrases.length < 1 || (phrases.length < maxPhrases && Math.random() < phraseGenerationProb)) {
+		var totalDuration = 0;
+		const phrase = [];
+		do {
+			const i = Math.floor(Math.random() * noteNames.length);
+			// var i;
+			// do {
+			// 	i = Math.floor(Math.random() * noteNames.length);
+			// } while (noteNames[i].endsWith('#'));
+			const name = noteNames[i];
+			const panNode = audioCtx.createStereoPanner();
+			panNode.pan.value = Math.random() * 2 - 1;
+			panNode.connect(audioCtx.destination);
 
-	// 		var duration;
-	// 		do {
-	// 			duration = Math.ceil(Math.random() * 8);
-	// 		} while (totalDuration + tempo * duration / 16 > tempo);
-	// 		phrase.push({
-	// 			name,
-	// 			detune: (i - noteNames.length / 2) * 100,
-	// 			panNode,
-	// 			duration,
-	// 		});
-	// 		totalDuration += tempo * duration / 16;
-	// 	} while (totalDuration < tempo);
+			var duration;
+			do {
+				duration = Math.ceil(Math.random() * 8);
+			} while (totalDuration + tempo * duration / 16 > tempo);
+			phrase.push({
+				name,
+				detune: (i - noteNames.length / 2) * 100,
+				panNode,
+				duration,
+			});
+			totalDuration += tempo * duration / 16;
+		} while (totalDuration < tempo);
 
-	// 	phrases.push(phrase);
+		phrases.push(phrase);
 
-	// 	if (phrases.length > 1 && Math.random() < phraseDestructionProb) {
-	// 		phrases.shift();
-	// 	}
-	// }
+		if (phrases.length > 1 && Math.random() < phraseDestructionProb) {
+			phrases.shift();
+		}
+	}
 
-	// phrase = phrases[Math.floor(Math.random() * phrases.length)];
-	// refreshDisplay();
-	// var delay = 0;
-	// var prevNote = null;
-	// for (const note of phrase) {
-	// 	note.isPlaying = false;
-	// 	// console.log('delay', delay);
-	// 	setTimeout(() => {
-	// 		const source = audioCtx.createBufferSource();
-	// 		source.detune.value = note.detune;
-	// 		source.buffer = buff;
-	// 		source.connect(note.panNode);
-	// 		source.start(0);
-	// 		note.isPlaying = true;
-	// 		if (prevNote) {
-	// 			prevNote.isPlaying = false;
-	// 		}
-	// 		prevNote = note;
-	// 		refreshDisplay();
-	// 	}, delay);
-	// 	delay += tempo * note.duration / 16;
-	// 	refreshDisplay();
-	// }
+	phrase = phrases[Math.floor(Math.random() * phrases.length)];
+	refreshDisplay();
+	var delay = 0;
+	var prevNote = null;
+	for (const note of phrase) {
+		note.isPlaying = false;
+		// console.log('delay', delay);
+		setTimeout(() => {
+			const source = audioCtx.createBufferSource();
+			source.detune.value = note.detune;
+			source.buffer = buffer;
+			source.connect(note.panNode);
+			source.start(0);
+			note.isPlaying = true;
+			if (prevNote) {
+				prevNote.isPlaying = false;
+			}
+			prevNote = note;
+			refreshDisplay();
+		}, delay);
+		delay += tempo * note.duration / 16;
+		refreshDisplay();
+	}
 }
 
 function refreshDisplay() {
