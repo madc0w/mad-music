@@ -2,8 +2,6 @@ const phraseGenerationProb = 0.4;
 const phraseDestructionProb = 0.1;
 const maxPhrases = 4;
 
-// const PitchShiftNode = require('pitch-shift-node');
-
 var phrases = [];
 var phrase;
 
@@ -25,8 +23,7 @@ function init() {
 	// }
 	// request.send();
 
-	const record = document.getElementById('start-recording');
-	const stop = document.getElementById('stop-recording');
+	const toggleRecordingButton = document.getElementById('toggle-recording');
 	const soundClips = document.getElementById('sound-clips');
 	const constraints = {
 		audio: true
@@ -36,28 +33,27 @@ function init() {
 	var startTime, recordingTime;
 	let onSuccess = stream => {
 		const mediaRecorder = new MediaRecorder(stream);
-		record.onclick = () => {
-			startTime = new Date();
-			mediaRecorder.start();
-			console.log(mediaRecorder.state);
-			console.log('recorder started');
-			record.style.background = 'red';
 
-			stop.disabled = false;
-			record.disabled = true;
-		}
-
-		stop.onclick = () => {
-			recordingTime = new Date() - startTime;
-			mediaRecorder.stop();
-			console.log(mediaRecorder.state);
-			console.log('recorder stopped. time: ', recordingTime);
-			record.style.background = '';
-			record.style.color = '';
-			// mediaRecorder.requestData();
-
-			stop.disabled = true;
-			record.disabled = false;
+		var isRecording = false;
+		toggleRecordingButton.onclick = () => {
+			isRecording = !isRecording;
+			if (isRecording) {
+				startTime = new Date();
+				mediaRecorder.start();
+				console.log(mediaRecorder.state);
+				console.log('recorder started');
+				toggleRecordingButton.style.background = 'red';
+				toggleRecordingButton.innerText = 'Stop';
+			} else {
+				recordingTime = new Date() - startTime;
+				mediaRecorder.stop();
+				console.log(mediaRecorder.state);
+				console.log('recorder stopped. time: ', recordingTime);
+				toggleRecordingButton.style.background = '';
+				toggleRecordingButton.style.color = '';
+				toggleRecordingButton.innerText = 'Record';
+				// mediaRecorder.requestData();
+			}
 		}
 
 		mediaRecorder.onstop = () => {
@@ -91,16 +87,17 @@ function init() {
 			audio.src = audioURL;
 			console.log('recorder stopped');
 
-			// const pitchNode = new PitchShiftNode(audioCtx, 1.25);
 			blob.arrayBuffer().then(recordedBuffer => {
 				const source = audioCtx.createBufferSource();
-				audioCtx.decodeAudioData(recordedBuffer, audioBuffer => {
-					source.buffer = audioBuffer;
+				audioCtx.decodeAudioData(recordedBuffer, decodedData => {
+					const inData = decodedData.getChannelData(0);
+					const shiftAmount = 0.75;
+					const outData = PitchShift(shiftAmount, inData.length, 1024, 10, audioCtx.sampleRate, inData);
+					decodedData.copyToChannel(outData, 0);
+					source.buffer = decodedData;
+					source.connect(audioCtx.destination);
+					source.start(0);
 				});
-				source.connect(audioCtx.destination);
-				source.start();
-				// source.connect(pitchNode);
-				// pitchNode.connect(context.destination);
 			});
 
 			deleteButton.onclick = e => {
@@ -109,9 +106,8 @@ function init() {
 			}
 
 			clipLabel.onclick = () => {
-				const existingName = clipLabel.textContent;
 				const newClipName = prompt('Enter a new name for your sound clip:');
-				clipLabel.textContent = newClipName || existingName;
+				clipLabel.textContent = newClipName || clipLabel.textContent;
 			}
 		}
 

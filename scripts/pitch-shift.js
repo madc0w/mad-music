@@ -50,7 +50,7 @@ var gSynFreq = new Array(MAX_FRAME_LENGTH).fill(0.0);
 var gSynMagn = new Array(MAX_FRAME_LENGTH).fill(0.0);
 var gRover = 0;
 var AudioContext = window.AudioContext || window.webkitAudioContext;
-var audioCtx = new AudioContext();
+// var audioCtx = new AudioContext();
 
 function loadTheTrack() {
 	var input = document.createElement('input');
