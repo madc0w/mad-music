@@ -3,9 +3,13 @@
 	<head>
 		<title>Mad Music</title>
 		<link rel="stylesheet" type="text/css" href="style.css" />
-		<script data-main="scripts/main" src="scripts/require.js"></script>
-		<!-- <script type="text/javascript" src="scripts/utils.js"></script> -->
-		<!-- <script type="text/javascript" src="scripts/main-3.js"></script> -->
+		<link rel="stylesheet" type="text/css" href="style-3.css" />
+		<!-- <link rel="stylesheet" type="text/css" href="dictaphone.css" /> -->
+		<!-- <script data-main="scripts/main" src="scripts/require.js"></script> -->
+		<script type="text/javascript" src="scripts/utils.js"></script>
+		<script type="text/javascript" src="scripts/pitch-shift-build.js"></script>
+		<script type="text/javascript" src="scripts/main-3.js"></script>
+		<!-- <script type="text/javascript" src="scripts/dictaphone.js"></script> -->
 		<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" />
 	</head>
 
@@ -17,6 +21,15 @@
 			<div>Press any key or click to play.</div>
 		</div>
 
+		<div id="recorder">
+			<section class="main-controls">
+				<div id="buttons">
+					<button id="start-recording">Record</button>
+					<button id="stop-recording">Stop</button>
+				</div>
+			</section>
+			<section id="sound-clips"></section>
+		</div>
 		<div id="playing-notes"></div>
 
 		<button id="stop-button">Do something different</button>

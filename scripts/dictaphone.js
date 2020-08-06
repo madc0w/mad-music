@@ -1,5 +1,3 @@
-// set up basic variables for app
-
 const record = document.querySelector('.record');
 const stop = document.querySelector('.stop');
 const soundClips = document.querySelector('.sound-clips');
@@ -12,7 +10,6 @@ stop.disabled = true;
 
 // visualiser setup - create web audio api context and canvas
 
-let audioCtx;
 const canvasCtx = canvas.getContext('2d');
 
 // main block for doing the audio recording
@@ -25,7 +22,7 @@ if (navigator.mediaDevices.getUserMedia) {
 	};
 	let chunks = [];
 
-	let onSuccess = function (stream) {
+	let onSuccess = stream => {
 		const mediaRecorder = new MediaRecorder(stream);
 
 		visualize(stream);
@@ -100,18 +97,15 @@ if (navigator.mediaDevices.getUserMedia) {
 		}
 	}
 
-	let onError = function (err) {
-		console.log('The following error occured: ' + err);
-	}
-
-	navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, onError);
+	navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, err => {
+		alert(err);
+	});
 
 } else {
 	console.log('getUserMedia not supported on your browser!');
 }
 
 function visualize(stream) {
-	audioCtx = audioCtx || new AudioContext();
 	const source = audioCtx.createMediaStreamSource(stream);
 	const analyser = audioCtx.createAnalyser();
 	analyser.fftSize = 2048;
