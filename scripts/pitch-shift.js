@@ -64,24 +64,24 @@ function loadTheTrack() {
 			console.log('decoding audio data with' + this.result);
 			document.getElementById('status').innerText = 'Pitch Shifting (yeah it takes a min)....';
 			audioCtx.decodeAudioData(this.result, (decodedData) => {
-				var in_data_l = decodedData.getChannelData(0);
+				const in_data_l = decodedData.getChannelData(0);
 				console.log(in_data_l);
-				var in_data_r = decodedData.getChannelData(1);
+				const in_data_r = decodedData.getChannelData(1);
 				console.log(in_data_r);
-				var shiftAmount = document.getElementById('shiftAmount').value;
+				const shiftAmount = document.getElementById('shiftAmount').value;
 				console.log(shiftAmount);
 				in_data_l = PitchShift(shiftAmount, in_data_l.length, 1024, 10, audioCtx.sampleRate, in_data_l);
 				console.log(in_data_l);
 				in_data_r = PitchShift(shiftAmount, in_data_l.length, 1024, 10, audioCtx.sampleRate, in_data_r);
 				decodedData.copyToChannel(in_data_l, 0);
 				decodedData.copyToChannel(in_data_r, 1);
-				var source = audioCtx.createBufferSource(); // creates a sound source
+				const source = audioCtx.createBufferSource(); // creates a sound source
 				source.buffer = decodedData;       // tell the source which sound to play
 				source.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
 				console.log('starting');
 				document.getElementById('status').innerText = 'Playing...';
 				source.start(0);                            // play the source now
-			}, (e) => {
+			}, e => {
 				alert('Sorry this browser unable to download this file... try Chrome');
 			});
 		}

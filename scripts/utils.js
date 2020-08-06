@@ -32,10 +32,14 @@ function start() {
 	}
 	didStart = true;
 	setInterval(loop, tempo);
+	initLoop();
 	loop();
 }
 
 function init() {
+}
+
+function initLoop() {
 }
 
 function play(note, done) {
