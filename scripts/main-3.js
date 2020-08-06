@@ -46,7 +46,6 @@ function init() {
 	const soundClips = document.getElementById('sound-clips');
 	let chunks = [];
 
-	var startTime, recordingTime;
 	let onSuccess = stream => {
 		const mediaRecorder = new MediaRecorder(stream);
 
@@ -54,12 +53,10 @@ function init() {
 		toggleRecordingButton.onclick = () => {
 			isRecording = !isRecording;
 			if (isRecording) {
-				startTime = new Date();
 				mediaRecorder.start();
 				toggleRecordingButton.style.background = 'red';
 				toggleRecordingButton.innerText = 'Stop';
 			} else {
-				recordingTime = new Date() - startTime;
 				mediaRecorder.stop();
 				toggleRecordingButton.style.background = '';
 				toggleRecordingButton.style.color = '';
@@ -136,12 +133,20 @@ function loop() {
 			do {
 				duration = Math.ceil(Math.random() * 8);
 			} while (totalDuration + tempo * duration / 16 > tempo);
-			phrase.push({
+			const durationTime = tempo * duration / 16;
+			const buffer = buffers[Math.floor(Math.random() * buffers.length)];
+			const pitchShift = 0.1 * Math.pow(2, (i - noteNames.length / 2) / 12) * durationTime / (1000 * buffer.duration);
+			const playbackRate = 1000 * buffer.duration / durationTime;
+			const note = {
+				buffer,
 				name,
-				detune: (i - noteNames.length / 2) * 100,
+				pitchShift,
+				playbackRate,
 				panNode,
 				duration,
-			});
+			};
+			// console.log(note);
+			phrase.push(note);
 			totalDuration += tempo * duration / 16;
 		} while (totalDuration < tempo);
 
@@ -161,8 +166,14 @@ function loop() {
 		// console.log('delay', delay);
 		setTimeout(() => {
 			const source = audioCtx.createBufferSource();
-			source.detune.value = note.detune;
-			source.buffer = buffers[Math.floor(Math.random() * buffers.length)];
+			source.playbackRate.value = note.playbackRate;
+			const inData = note.buffer.getChannelData(0);
+			const audioBuffer = audioCtx.createBuffer(1, inData.length, audioCtx.sampleRate);
+			audioBuffer.copyToChannel(inData, 0);
+			PitchShift(note.pitchShift, audioBuffer.length, 1024, 10, audioCtx.sampleRate, audioBuffer);
+			source.buffer = audioBuffer;
+			// console.log('note', note);
+			// console.log('duration', source.buffer.duration);
 			source.connect(note.panNode);
 			source.start();
 			note.isPlaying = true;

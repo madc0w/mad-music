@@ -98,7 +98,7 @@ function PitchShift(/* float[*/ pitchShift, /* long */ numSampsToProcess, /* lon
             /* long */ var i, k, qpd, index, inFifoLatency, stepSize, fftFrameSize2;
 
 
-            /* float[] */var outdata = indata;
+            /* float[] */const outdata = indata;
 	/* set up some handy variables */
 	fftFrameSize2 = Math.trunc(fftFrameSize / 2);
 	stepSize = Math.trunc(fftFrameSize / osamp);
