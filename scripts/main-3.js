@@ -1,6 +1,7 @@
 const phraseGenerationProb = 0.4;
-const phraseDestructionProb = 0.1;
+const phraseDestructionProb = 0.16;
 const maxPhrases = 4;
+var beatsPerMesaure = 8;
 
 var phrases = [];
 var phrase;
@@ -89,27 +90,9 @@ function init() {
 			const audioURL = window.URL.createObjectURL(blob);
 			audio.src = audioURL;
 			blob.arrayBuffer().then(recordedBuffer => {
-				audioCtx.decodeAudioData(recordedBuffer, decodedData => {
+				audioCtx.decodeAudioData(recordedBuffer, audioBuffer => {
 					goButton.disabled = false;
-					buffers.push(decodedData);
-
-					const shiftAmount = 0.5;
-					const source = audioCtx.createBufferSource();
-					var inData = decodedData.getChannelData(0);
-
-					// // fail
-					// const audioBuffer = audioCtx.createBuffer(1, inData.length, audioCtx.sampleRate);
-					// audioBuffer.copyToChannel(inData, 0);
-					// PitchShift(shiftAmount, audioBuffer.length, 1024, 10, audioCtx.sampleRate, audioBuffer);
-					// source.buffer = audioBuffer;
-
-					// ok
-					PitchShift(shiftAmount, inData.length, 1024, 10, audioCtx.sampleRate, inData);
-					decodedData.copyToChannel(inData, 0);
-					source.buffer = decodedData;
-
-					source.connect(audioCtx.destination);
-					source.start();
+					buffers.push(audioBuffer);
 				});
 			});
 
@@ -137,9 +120,7 @@ function loop() {
 		var totalDuration = 0;
 		const phrase = [];
 		do {
-			// const i = Math.floor(Math.random() * noteNames.length);
-			const i = 12;
-			// var i;
+			const i = Math.floor(Math.random() * noteNames.length);
 			// do {
 			// 	i = Math.floor(Math.random() * noteNames.length);
 			// } while (noteNames[i].endsWith('#'));
@@ -151,8 +132,8 @@ function loop() {
 			var duration;
 			do {
 				duration = Math.ceil(Math.random() * 8);
-			} while (totalDuration + tempo * duration / 16 > tempo);
-			const durationTime = tempo * duration / 16;
+			} while (totalDuration + tempo * duration / beatsPerMesaure > tempo);
+			const durationTime = tempo * duration / beatsPerMesaure;
 			// const durationTime = buffers.length * 1000;
 			const buffer = buffers[Math.floor(Math.random() * buffers.length)];
 			const pitchShift = Math.pow(2, (i - noteNames.length / 2) / 12) * durationTime / (1000 * buffer.duration);
@@ -167,14 +148,46 @@ function loop() {
 			};
 			// console.log(note);
 			phrase.push(note);
-			totalDuration += tempo * duration / 16;
+			totalDuration += tempo * duration / beatsPerMesaure;
 		} while (totalDuration < tempo);
+
+		// // for testing
+		// const notes = [{
+		// 	i: 8,
+		// 	duration: 8,
+		// }, {
+		// 	i: 10,
+		// 	duration: 4,
+		// }, {
+		// 	i: 12,
+		// 	duration: 4,
+		// }];
+		// for (const _note of notes) {
+		// 	const panNode = audioCtx.createStereoPanner();
+		// 	panNode.pan.value = Math.random() * 2 - 1;
+		// 	panNode.connect(audioCtx.destination);
+		// 	const name = noteNames[_note.i];
+		// 	const durationTime = tempo * _note.duration / beatsPerMesaure;
+		// 	const buffer = buffers[Math.floor(Math.random() * buffers.length)];
+		// 	const pitchShift = Math.pow(2, (_note.i - noteNames.length / 2) / 12) * durationTime / (1000 * buffer.duration);
+		// 	const playbackRate = 1000 * buffer.duration / durationTime;
+		// 	const note = {
+		// 		buffer,
+		// 		name,
+		// 		pitchShift,
+		// 		playbackRate,
+		// 		panNode,
+		// 		duration: _note.duration,
+		// 	};
+		// 	console.log(note);
+		// 	phrase.push(note);
+		// }
 
 		phrases.push(phrase);
 
-		if (phrases.length > 1 && Math.random() < phraseDestructionProb) {
-			phrases.shift();
-		}
+	}
+	if (phrases.length > 1 && Math.random() < phraseDestructionProb) {
+		phrases.shift();
 	}
 
 	phrase = phrases[Math.floor(Math.random() * phrases.length)];
@@ -188,10 +201,12 @@ function loop() {
 			const source = audioCtx.createBufferSource();
 			source.playbackRate.value = note.playbackRate;
 			const inData = note.buffer.getChannelData(0);
-			const audioBuffer = audioCtx.createBuffer(1, inData.length, audioCtx.sampleRate);
-			audioBuffer.copyToChannel(inData, 0);
-			PitchShift(note.pitchShift, audioBuffer.length, 1024, 10, audioCtx.sampleRate, audioBuffer);
-			source.buffer = audioBuffer;
+			const inDataCopy = new Float32Array(inData);
+			PitchShift(note.pitchShift, inDataCopy.length, 1024, 10, audioCtx.sampleRate, inDataCopy);
+			const audioBufferCopy = audioCtx.createBuffer(note.buffer.numberOfChannels, note.buffer.length, note.buffer.sampleRate);
+			audioBufferCopy.copyToChannel(inDataCopy, 0);
+			source.buffer = audioBufferCopy;
+
 			console.log('note', note);
 			// console.log('duration', source.buffer.duration);
 			source.connect(note.panNode);
@@ -203,7 +218,7 @@ function loop() {
 			prevNote = note;
 			refreshDisplay();
 		}, delay);
-		delay += tempo * note.duration / 16;
+		delay += tempo * note.duration / beatsPerMesaure;
 		refreshDisplay();
 	}
 }

@@ -3,6 +3,7 @@ const attack = 0.6;
 const decay = 0.3;
 const lowFreq = 110;
 const numWaveCompnents = 6;
+var beatsPerMesaure = 16;
 
 var playingNotesDiv, stopButton;
 const noteNames = [
@@ -49,8 +50,8 @@ function play(note, done) {
 		ramp(note, true);
 		setTimeout(() => {
 			ramp(note, false, done);
-		}, (note.duration * tempo / 16) - decay);
-	}, note.delay * tempo / 16);
+		}, (note.duration * tempo / beatsPerMesaure) - decay);
+	}, note.delay * tempo / beatsPerMesaure);
 }
 
 function ramp(note, isUp, done) {
@@ -77,7 +78,7 @@ function ramp(note, isUp, done) {
 	}
 	note.ramping = isUp ? 'up' : 'down';
 	const startTime = audioCtx.currentTime;
-	const endTime = startTime + (note.duration * tempo / 16) * (isUp ? attack : decay) / 1000;
+	const endTime = startTime + (note.duration * tempo / beatsPerMesaure) * (isUp ? attack : decay) / 1000;
 	var val = isUp ? 0 : 1;
 	const interval = 4;
 	const step = (isUp ? 1 : -1) * interval / (1000 * (endTime - startTime));
