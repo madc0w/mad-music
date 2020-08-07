@@ -34,3 +34,7 @@
 #https-warning {
 	font-weight: bold;
 }
+
+#instructions div {
+	margin-top: 4px;
+}
