@@ -79,7 +79,7 @@ function init() {
 			clipLabel.textContent = `Clip ${clipNum}`;
 			clipContainer.appendChild(audio);
 			clipContainer.appendChild(deleteButton);
-			clipContainer.appendChild(clipLabel);
+			// clipContainer.appendChild(clipLabel);
 			soundClips.appendChild(clipContainer);
 
 			audio.controls = true;
