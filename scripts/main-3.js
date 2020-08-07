@@ -70,15 +70,15 @@ function init() {
 			const clipContainer = document.createElement('article');
 			const clipLabel = document.createElement('p');
 			const audio = document.createElement('audio');
-			// const deleteButton = document.createElement('button');
+			const deleteButton = document.createElement('button');
 
 			clipContainer.classList.add('clip');
 			audio.setAttribute('controls', '');
-			// deleteButton.textContent = 'Delete';
-			// deleteButton.className = 'delete-recording';
+			deleteButton.textContent = 'Delete';
+			deleteButton.className = 'delete-recording';
 			clipLabel.textContent = `Clip ${clipNum}`;
 			clipContainer.appendChild(audio);
-			// clipContainer.appendChild(deleteButton);
+			clipContainer.appendChild(deleteButton);
 			clipContainer.appendChild(clipLabel);
 			soundClips.appendChild(clipContainer);
 
@@ -92,14 +92,22 @@ function init() {
 			blob.arrayBuffer().then(recordedBuffer => {
 				audioCtx.decodeAudioData(recordedBuffer, audioBuffer => {
 					goButton.disabled = false;
+					deleteButton.bufferIndex = buffers.length;
 					buffers.push(audioBuffer);
 				});
 			});
 
-			// deleteButton.onclick = e => {
-			// 	let evtTgt = e.target;
-			// 	evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
-			// }
+			deleteButton.onclick = e => {
+				let button = e.target;
+				buffers.splice(button.bufferIndex, 1);
+				if (buffers.length == 0) {
+					didStart = false;
+					goButton.disabled = true;
+					stop();
+					clearInterval(mainLoopIntervalId);
+				}
+				button.parentNode.parentNode.removeChild(button.parentNode);
+			}
 		}
 
 		mediaRecorder.ondataavailable = e => {
@@ -228,11 +236,13 @@ function refreshDisplay() {
 	html += '<div class="mesure-num">';
 	html += measureNum;
 	html += '</div>';
-	for (const note of phrase) {
-		const className = note.isPlaying ? 'playing' : '';
-		html += `<span class="note ${className}">`;
-		html += note.name;
-		html += '</span>';
+	if (phrase) {
+		for (const note of phrase) {
+			const className = note.isPlaying ? 'playing' : '';
+			html += `<span class="note ${className}">`;
+			html += note.name;
+			html += '</span>';
+		}
 	}
 	playingNotesDiv.innerHTML = html;
 }
@@ -240,4 +250,6 @@ function refreshDisplay() {
 function stop() {
 	measureNum = 1;
 	phrases = [];
+	phrase = null;
+	refreshDisplay();
 }

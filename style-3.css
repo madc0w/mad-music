@@ -30,3 +30,7 @@
 #toggle-recording {
 	width: 100px;
 }
+
+#https-warning {
+	font-weight: bold;
+}

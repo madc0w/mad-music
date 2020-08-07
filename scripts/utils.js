@@ -4,6 +4,7 @@ const decay = 0.3;
 const lowFreq = 110;
 const numWaveCompnents = 6;
 var beatsPerMesaure = 16;
+var mainLoopIntervalId;
 
 var playingNotesDiv, stopButton;
 const noteNames = [
@@ -32,7 +33,7 @@ function start() {
 		return;
 	}
 	didStart = true;
-	setInterval(loop, tempo);
+	mainLoopIntervalId = setInterval(loop, tempo);
 	initLoop();
 	loop();
 }
