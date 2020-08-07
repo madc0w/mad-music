@@ -70,15 +70,15 @@ function init() {
 			const clipContainer = document.createElement('article');
 			const clipLabel = document.createElement('p');
 			const audio = document.createElement('audio');
-			const deleteButton = document.createElement('button');
+			// const deleteButton = document.createElement('button');
 
 			clipContainer.classList.add('clip');
 			audio.setAttribute('controls', '');
-			deleteButton.textContent = 'Delete';
-			deleteButton.className = 'delete-recording';
+			// deleteButton.textContent = 'Delete';
+			// deleteButton.className = 'delete-recording';
 			clipLabel.textContent = `Clip ${clipNum}`;
 			clipContainer.appendChild(audio);
-			clipContainer.appendChild(deleteButton);
+			// clipContainer.appendChild(deleteButton);
 			clipContainer.appendChild(clipLabel);
 			soundClips.appendChild(clipContainer);
 
@@ -96,10 +96,10 @@ function init() {
 				});
 			});
 
-			deleteButton.onclick = e => {
-				let evtTgt = e.target;
-				evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
-			}
+			// deleteButton.onclick = e => {
+			// 	let evtTgt = e.target;
+			// 	evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
+			// }
 		}
 
 		mediaRecorder.ondataavailable = e => {
