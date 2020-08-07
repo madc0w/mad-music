@@ -64,9 +64,9 @@ function loadTheTrack() {
 			console.log('decoding audio data with' + this.result);
 			document.getElementById('status').innerText = 'Pitch Shifting (yeah it takes a min)....';
 			audioCtx.decodeAudioData(this.result, (decodedData) => {
-				const in_data_l = decodedData.getChannelData(0);
+				var in_data_l = decodedData.getChannelData(0);
 				console.log(in_data_l);
-				const in_data_r = decodedData.getChannelData(1);
+				var in_data_r = decodedData.getChannelData(1);
 				console.log(in_data_r);
 				const shiftAmount = document.getElementById('shiftAmount').value;
 				console.log(shiftAmount);

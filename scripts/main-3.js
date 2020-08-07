@@ -92,6 +92,24 @@ function init() {
 				audioCtx.decodeAudioData(recordedBuffer, decodedData => {
 					goButton.disabled = false;
 					buffers.push(decodedData);
+
+					const shiftAmount = 0.5;
+					const source = audioCtx.createBufferSource();
+					var inData = decodedData.getChannelData(0);
+
+					// // fail
+					// const audioBuffer = audioCtx.createBuffer(1, inData.length, audioCtx.sampleRate);
+					// audioBuffer.copyToChannel(inData, 0);
+					// PitchShift(shiftAmount, audioBuffer.length, 1024, 10, audioCtx.sampleRate, audioBuffer);
+					// source.buffer = audioBuffer;
+
+					// ok
+					PitchShift(shiftAmount, inData.length, 1024, 10, audioCtx.sampleRate, inData);
+					decodedData.copyToChannel(inData, 0);
+					source.buffer = decodedData;
+
+					source.connect(audioCtx.destination);
+					source.start();
 				});
 			});
 
@@ -119,7 +137,8 @@ function loop() {
 		var totalDuration = 0;
 		const phrase = [];
 		do {
-			const i = Math.floor(Math.random() * noteNames.length);
+			// const i = Math.floor(Math.random() * noteNames.length);
+			const i = 12;
 			// var i;
 			// do {
 			// 	i = Math.floor(Math.random() * noteNames.length);
@@ -134,8 +153,9 @@ function loop() {
 				duration = Math.ceil(Math.random() * 8);
 			} while (totalDuration + tempo * duration / 16 > tempo);
 			const durationTime = tempo * duration / 16;
+			// const durationTime = buffers.length * 1000;
 			const buffer = buffers[Math.floor(Math.random() * buffers.length)];
-			const pitchShift = 0.1 * Math.pow(2, (i - noteNames.length / 2) / 12) * durationTime / (1000 * buffer.duration);
+			const pitchShift = Math.pow(2, (i - noteNames.length / 2) / 12) * durationTime / (1000 * buffer.duration);
 			const playbackRate = 1000 * buffer.duration / durationTime;
 			const note = {
 				buffer,
@@ -172,7 +192,7 @@ function loop() {
 			audioBuffer.copyToChannel(inData, 0);
 			PitchShift(note.pitchShift, audioBuffer.length, 1024, 10, audioCtx.sampleRate, audioBuffer);
 			source.buffer = audioBuffer;
-			// console.log('note', note);
+			console.log('note', note);
 			// console.log('duration', source.buffer.duration);
 			source.connect(note.panNode);
 			source.start();
