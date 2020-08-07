@@ -55,10 +55,11 @@
 	cursor: pointer;
 	font-weight: bold;
 	border-radius: 8px;
+	white-space: nowrap;
 }
 
 #prerecorded-clips span:hover {
-	background-color: #999;
+	background-color: #cdc;
 }
 
 .clip-name {
