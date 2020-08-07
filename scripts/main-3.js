@@ -3,11 +3,10 @@ const phraseDestructionProb = 0.16;
 const maxPhrases = 4;
 var beatsPerMesaure = 4;
 
+const baseUrl = 'http://heliosophiclabs.com/~mad/projects/mad-music';
 var phrases = [];
 var phrase;
-var goButton;
-
-var clipNum = 0;
+var goButton, soundClips;
 var buffers = [];
 
 function onLoad() {
@@ -24,27 +23,30 @@ function onLoad() {
 		start();
 	};
 
+	const prerecordedClips = document.getElementById('prerecorded-clips').children;
+	for (var i = 0; i < prerecordedClips.length; i++) {
+		const el = prerecordedClips.item(i);
+		el.onclick = () => {
+			const fileName = el.getAttribute('file');
+			const request = new XMLHttpRequest();
+			const url = `${baseUrl}/${fileName}`;
+			request.open('GET', url, true);
+			request.responseType = 'arraybuffer';
+			request.onload = () => {
+				addClip(url, request.response, el.innerText);
+				// el.classList.add('loaded');
+			}
+			request.send();
+		};
+	}
+
 	init();
 }
 
 
 function init() {
-	// const request = new XMLHttpRequest();
-	// request.open('GET', 'http://heliosophiclabs.com/~mad/projects/mad-music/non.mp3', true);
-	// // request.open('GET', 'non.mp3', true);
-	// request.responseType = 'arraybuffer';
-	// request.onload = () => {
-	// 	audioCtx.decodeAudioData(request.response, buffer => {
-	// 		buff = buffer;
-	// 		console.log('length', buff.length / audioCtx.sampleRate);
-	// 	}, err => {
-	// 		console.error(err);
-	// 	});
-	// }
-	// request.send();
-
 	const toggleRecordingButton = document.getElementById('toggle-recording');
-	const soundClips = document.getElementById('sound-clips');
+	soundClips = document.getElementById('sound-clips');
 	let chunks = [];
 
 	let onSuccess = stream => {
@@ -66,48 +68,14 @@ function init() {
 		}
 
 		mediaRecorder.onstop = () => {
-			clipNum++;
-			const clipContainer = document.createElement('article');
-			const clipLabel = document.createElement('p');
-			const audio = document.createElement('audio');
-			const deleteButton = document.createElement('button');
-
-			clipContainer.classList.add('clip');
-			audio.setAttribute('controls', '');
-			deleteButton.textContent = 'Delete';
-			deleteButton.className = 'delete-recording';
-			clipLabel.textContent = `Clip ${clipNum}`;
-			clipContainer.appendChild(audio);
-			clipContainer.appendChild(deleteButton);
-			// clipContainer.appendChild(clipLabel);
-			soundClips.appendChild(clipContainer);
-
-			audio.controls = true;
 			const blob = new Blob(chunks, {
 				type: 'audio/ogg; codecs=opus'
 			});
 			chunks = [];
-			const audioURL = window.URL.createObjectURL(blob);
-			audio.src = audioURL;
+			const audioUrl = window.URL.createObjectURL(blob);
 			blob.arrayBuffer().then(recordedBuffer => {
-				audioCtx.decodeAudioData(recordedBuffer, audioBuffer => {
-					goButton.disabled = false;
-					deleteButton.bufferIndex = buffers.length;
-					buffers.push(audioBuffer);
-				});
+				addClip(audioUrl, recordedBuffer);
 			});
-
-			deleteButton.onclick = e => {
-				let button = e.target;
-				buffers.splice(button.bufferIndex, 1);
-				if (buffers.length == 0) {
-					didStart = false;
-					goButton.disabled = true;
-					stop();
-					clearInterval(mainLoopIntervalId);
-				}
-				button.parentNode.parentNode.removeChild(button.parentNode);
-			}
 		}
 
 		mediaRecorder.ondataavailable = e => {
@@ -252,4 +220,44 @@ function stop() {
 	phrases = [];
 	phrase = null;
 	refreshDisplay();
+}
+
+function addClip(audioUrl, recordedBuffer, name) {
+	const clipContainer = document.createElement('article');
+	const audio = document.createElement('audio');
+	const deleteButton = document.createElement('button');
+
+	clipContainer.classList.add('clip');
+	audio.setAttribute('controls', '');
+	deleteButton.textContent = 'Delete';
+	deleteButton.className = 'delete-recording';
+	if (name) {
+		const nameElement = document.createElement('div');
+		nameElement.classList.add('clip-name');
+		nameElement.innerText = name;
+		clipContainer.appendChild(nameElement);
+	}
+	clipContainer.appendChild(audio);
+	clipContainer.appendChild(deleteButton);
+	soundClips.appendChild(clipContainer);
+
+	audio.controls = true;
+	audio.src = audioUrl;
+	audioCtx.decodeAudioData(recordedBuffer, audioBuffer => {
+		goButton.disabled = false;
+		deleteButton.bufferIndex = buffers.length;
+		buffers.push(audioBuffer);
+	});
+
+	deleteButton.onclick = e => {
+		let button = e.target;
+		buffers.splice(button.bufferIndex, 1);
+		if (buffers.length == 0) {
+			didStart = false;
+			goButton.disabled = true;
+			stop();
+			clearInterval(mainLoopIntervalId);
+		}
+		button.parentNode.parentNode.removeChild(button.parentNode);
+	}
 }
