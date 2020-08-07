@@ -1,7 +1,7 @@
 const phraseGenerationProb = 0.4;
 const phraseDestructionProb = 0.16;
 const maxPhrases = 4;
-var beatsPerMesaure = 8;
+var beatsPerMesaure = 4;
 
 var phrases = [];
 var phrase;
