@@ -118,7 +118,7 @@ function loop() {
 
 			var duration;
 			do {
-				duration = Math.ceil(Math.random() * (beatsPerMesaure - 1));
+				duration = Math.ceil(Math.random() * Math.min(6, (beatsPerMesaure - 1)));
 			} while (totalDuration + tempo * duration / beatsPerMesaure > tempo);
 			const durationTime = tempo * duration / beatsPerMesaure;
 			// const durationTime = buffers.length * 1000;
