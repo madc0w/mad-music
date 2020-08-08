@@ -222,7 +222,12 @@ function refreshDisplay() {
 		for (const note of phrase) {
 			const className = note.isPlaying ? 'playing' : '';
 			html += `<span class="note ${className}">`;
+			html += '<div>';
 			html += note.name;
+			html += '</div>';
+			html += '<div class="duration">';
+			html += note.duration;
+			html += '</div>';
 			html += '</span>';
 		}
 	}

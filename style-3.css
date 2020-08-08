@@ -78,3 +78,18 @@
 	display: inline-block;
 	margin-left: 16px;
 }
+
+.note {
+	display: inline-block;
+	top: -6px;
+	position: relative;
+}
+
+.note .duration {
+	font-size: 8px;
+	text-align: center;
+}
+
+#playing-notes {
+	height: 32px;
+}
