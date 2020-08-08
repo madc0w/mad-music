@@ -9,6 +9,9 @@
 	border-width: 2px;
 	border-color: #00a;
 	width: 420px;
+}
+
+#sound-clips {
 	max-height: 300px;
 	overflow-y: auto;
 }
