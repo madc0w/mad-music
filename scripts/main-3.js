@@ -13,9 +13,19 @@ function onLoad() {
 	playingNotesDiv = document.getElementById('playing-notes');
 	stopButton = document.getElementById('stop-button');
 	goButton = document.getElementById('go-button');
+	const beatsPerMeasureDropdown = document.getElementById('beats-per-measure-dropdown');
 	goButton.disabled = true;
 
+	beatsPerMeasureDropdown.onchange = e => {
+		beatsPerMesaure = parseInt(e.target.options.item(e.target.selectedIndex).innerText);
+		stop();
+		if (buffers.length > 0) {
+			start();
+		}
+	};
+
 	stopButton.onclick = () => {
+		clearInterval(mainLoopIntervalId);
 		stop();
 		refreshDisplay();
 	};
@@ -220,6 +230,7 @@ function refreshDisplay() {
 }
 
 function stop() {
+	currPhraseRepeatNum = 0;
 	measureNum = 1;
 	phrases = [];
 	phrase = null;

@@ -70,3 +70,8 @@
 	margin-bottom: 6px;
 	margin-left: 16px;
 }
+
+#beats-per-measure-dropdown-container {
+	display: inline-block;
+	margin-left: 16px;
+}
