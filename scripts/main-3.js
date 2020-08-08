@@ -90,6 +90,7 @@ function init() {
 	});
 }
 
+var currPhraseRepeatNum = 0;
 function loop() {
 	console.log('measure: ' + ++measureNum);
 	if (phrases.length < 1 || (phrases.length < maxPhrases && Math.random() < phraseGenerationProb)) {
@@ -107,7 +108,7 @@ function loop() {
 
 			var duration;
 			do {
-				duration = Math.ceil(Math.random() * 8);
+				duration = Math.ceil(Math.random() * (beatsPerMesaure - 1));
 			} while (totalDuration + tempo * duration / beatsPerMesaure > tempo);
 			const durationTime = tempo * duration / beatsPerMesaure;
 			// const durationTime = buffers.length * 1000;
@@ -160,13 +161,16 @@ function loop() {
 		// }
 
 		phrases.push(phrase);
-
 	}
 	if (phrases.length > 1 && Math.random() < phraseDestructionProb) {
 		phrases.shift();
 	}
 
-	phrase = phrases[Math.floor(Math.random() * phrases.length)];
+	if (currPhraseRepeatNum == 0) {
+		currPhraseRepeatNum = Math.random() < 0.3 ? 2 : 4;
+		phrase = phrases[Math.floor(Math.random() * phrases.length)];
+	}
+	currPhraseRepeatNum--;
 	refreshDisplay();
 	var delay = 0;
 	var prevNote = null;
