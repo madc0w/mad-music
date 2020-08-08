@@ -8,7 +8,9 @@
 	border-style: solid;
 	border-width: 2px;
 	border-color: #00a;
-	width: 400px;
+	width: 420px;
+	max-height: 300px;
+	overflow-y: auto;
 }
 
 .clip {
@@ -46,6 +48,7 @@
 
 #prerecorded-clips {
 	margin-top: 8px;
+	line-height: 22px;
 }
 
 #prerecorded-clips span {
