@@ -3,7 +3,7 @@ const phraseDestructionProb = 0.16;
 const maxPhrases = 4;
 var beatsPerMesaure = 4;
 
-const baseUrl = 'http://heliosophiclabs.com/~mad/projects/mad-music';
+const baseUrl = 'https://www.gglabs.com/~mad/projects/mad-music';
 var phrases = [];
 var phrase;
 var goButton, soundClips;
