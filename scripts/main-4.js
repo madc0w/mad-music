@@ -8,7 +8,7 @@ const clips = [{
 	displayName: 'Snare',
 }, {
 	fileName: 'bass-drum-1',
-	displayName: 'Bass 1',
+	displayName: 'Bass Drum',
 }, {
 	fileName: 'hi-hat-1',
 	displayName: 'High Hat 1',
@@ -18,7 +18,38 @@ const clips = [{
 }, {
 	fileName: 'swoosh',
 	displayName: 'Swoosh',
+}, {
+	fileName: 'gunshot',
+	displayName: 'Gunshot',
+}, {
+	fileName: 'boom',
+	displayName: 'Boom',
+}, {
+	fileName: 'boom-rattle',
+	displayName: 'Boom Rattle',
+}, {
+	fileName: 'clap-1',
+	displayName: 'Clap 1',
+}, {
+	fileName: 'clap-2',
+	displayName: 'Clap 2',
+}, {
+	fileName: 'clap-2',
+	displayName: 'Clap 2',
+}, {
+	fileName: 'gong-2',
+	displayName: 'Gong 1',
+}, {
+	fileName: 'gong-3',
+	displayName: 'Gong 2',
+}, {
+	fileName: 'gong-4',
+	displayName: 'Gong 3',
+}, {
+	fileName: 'gong-5',
+	displayName: 'Gong 4',
 }];
+
 
 const playingClips = [];
 
@@ -50,6 +81,23 @@ function onLoad() {
 		}
 		measures.innerHTML = html;
 	}
+
+	const resetButton = document.getElementById('reset-button');
+	resetButton.onclick = () => {
+		isPlaying = false;
+		clearInterval(intervalId);
+		toggleButton.innerHTML = 'GO';
+		playingClips.splice(0, playingClips.length);
+		const noteEls = document.getElementsByClassName('note');
+		for (const el of noteEls) {
+			el.classList.remove('selected');
+		}
+		const beatNumEls = document.getElementsByClassName('beat-number');
+		for (const el of beatNumEls) {
+			el.classList.remove('current');
+		}
+		mesaureNum = 0;
+	};
 
 	const toggleButton = document.getElementById('toggle-button');
 	toggleButton.onclick = () => {
