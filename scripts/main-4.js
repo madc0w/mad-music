@@ -80,13 +80,22 @@ function onLoad() {
 			html += clip.displayName;
 			html += '</td>';
 			for (let i = 0; i < beatsPerMesaure; i++) {
-				html += `<td class="note" id="note-${clip.fileName}-${i}" onClick="toggleNote(this, '${clip.fileName}', ${i})">`;
+				html += `<td class="note beat-${i}" id="note-${clip.fileName}-${i}" onClick="toggleNote(this, '${clip.fileName}', ${i})">`;
 				html += '</td>';
 			}
 			html += '</tr>';
 		}
 		measures.innerHTML = html;
 	}
+
+	const tempoSlider = document.getElementById('tempo-slider');
+	tempoSlider.onchange = el => {
+		tempo = parseInt(el.target.value);
+		if (isPlaying) {
+			clearInterval(intervalId);
+			intervalId = setInterval(loop, tempo);
+		}
+	};
 
 	function reset() {
 		isPlaying = false;
@@ -115,6 +124,7 @@ function onLoad() {
 			const clipName = clips[Math.floor(Math.random() * clips.length)].fileName;
 			document.getElementById(`note-${clipName}-${beatNum}`).click();
 		}
+		toggleButton.onclick();
 	};
 
 	const toggleButton = document.getElementById('toggle-button');
@@ -161,6 +171,18 @@ function loop() {
 			beatTd.classList.add('current');
 		} else {
 			beatTd.classList.remove('current');
+		}
+	}
+	{
+		const noteCells = document.getElementsByClassName('note');
+		for (const noteCell of noteCells) {
+			noteCell.classList.remove('current');
+		}
+	}
+	{
+		const noteCells = document.getElementsByClassName(`beat-${beatNum}`);
+		for (const noteCell of noteCells) {
+			noteCell.classList.add('current');
 		}
 	}
 	mesaureNum++;

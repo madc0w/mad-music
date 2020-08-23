@@ -14,6 +14,12 @@
 	font-weight: bold;
 }
 
+#measures-table td.note.current {
+	border-style: solid;
+	border-color: #222;
+	border-width: 2px;
+}
+
 #measures-table .clip-name {
 	background-color: #eee;
 	min-width: 100px;
@@ -35,4 +41,13 @@
 
 #measures-table .note.selected {
 	background-color: #4d4;
+}
+
+#tempo-slider-container {
+	margin-top: 12px;
+	font-weight: bold;
+}
+
+#tempo-slider {
+	width: 200px;
 }
