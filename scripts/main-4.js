@@ -1,14 +1,15 @@
 var tempo = 200;
+const numRandomNotes = 24;
 
 let mesaureNum = 0;
 let intervalId;
 let isPlaying = false;
 const clips = [{
-	fileName: 'snare-1',
-	displayName: 'Snare',
-}, {
 	fileName: 'bass-drum-1',
 	displayName: 'Bass Drum',
+}, {
+	fileName: 'snare-1',
+	displayName: 'Snare',
 }, {
 	fileName: 'hi-hat-1',
 	displayName: 'High Hat 1',
@@ -22,12 +23,6 @@ const clips = [{
 	fileName: 'gunshot',
 	displayName: 'Gunshot',
 }, {
-	fileName: 'jews-harp',
-	displayName: 'Jew\'s Harp 1',
-}, {
-	fileName: 'jews-harp-2',
-	displayName: 'Jew\'s Harp 2',
-}, {
 	fileName: 'boom',
 	displayName: 'Boom',
 }, {
@@ -40,8 +35,11 @@ const clips = [{
 	fileName: 'clap-2',
 	displayName: 'Clap 2',
 }, {
-	fileName: 'clap-2',
-	displayName: 'Clap 2',
+	fileName: 'jews-harp',
+	displayName: 'Jew\'s Harp 1',
+}, {
+	fileName: 'jews-harp-2',
+	displayName: 'Jew\'s Harp 2',
 }, {
 	fileName: 'gong-2',
 	displayName: 'Gong 1',
@@ -119,7 +117,7 @@ function onLoad() {
 	const randomButton = document.getElementById('random-button');
 	randomButton.onclick = () => {
 		reset();
-		for (let i = 0; i < 20; i++) {
+		for (let i = 0; i < numRandomNotes; i++) {
 			const beatNum = Math.floor(Math.random() * beatsPerMesaure);
 			const clipName = clips[Math.floor(Math.random() * clips.length)].fileName;
 			document.getElementById(`note-${clipName}-${beatNum}`).click();
