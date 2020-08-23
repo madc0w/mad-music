@@ -9,6 +9,15 @@ const clips = [{
 }, {
 	fileName: 'bass-drum-1',
 	displayName: 'Bass 1',
+}, {
+	fileName: 'hi-hat-1',
+	displayName: 'High Hat 1',
+}, {
+	fileName: 'hi-hat-2',
+	displayName: 'High Hat 2',
+}, {
+	fileName: 'swoosh',
+	displayName: 'Swoosh',
 }];
 
 const playingClips = [];
@@ -53,18 +62,18 @@ function onLoad() {
 		}
 	};
 
-	const request = new XMLHttpRequest();
-	const clipName = 'snare-1';
-	const url = `${baseUrl}/${clipName}.mp3`;
-	request.open('GET', url, true);
-	request.responseType = 'arraybuffer';
-	request.onload = () => {
-		audioCtx.decodeAudioData(request.response, audioBuffer => {
-			buffers[clipName] = audioBuffer;
-		});
+	for (const clip of clips) {
+		const request = new XMLHttpRequest();
+		const url = `${baseUrl}/${clip.fileName}.mp3`;
+		request.open('GET', url, true);
+		request.responseType = 'arraybuffer';
+		request.onload = () => {
+			audioCtx.decodeAudioData(request.response, audioBuffer => {
+				buffers[clip.fileName] = audioBuffer;
+			});
+		}
+		request.send();
 	}
-	request.send();
-
 
 }
 
