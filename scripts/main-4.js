@@ -15,12 +15,18 @@ const clips = [{
 }, {
 	fileName: 'hi-hat-2',
 	displayName: 'High Hat 2',
-}, {
-	fileName: 'swoosh',
-	displayName: 'Swoosh',
+	// }, {
+	// 	fileName: 'swoosh',
+	// 	displayName: 'Swoosh',
 }, {
 	fileName: 'gunshot',
 	displayName: 'Gunshot',
+}, {
+	fileName: 'jews-harp',
+	displayName: 'Jew\'s Harp 1',
+}, {
+	fileName: 'jews-harp-2',
+	displayName: 'Jew\'s Harp 2',
 }, {
 	fileName: 'boom',
 	displayName: 'Boom',
@@ -74,7 +80,7 @@ function onLoad() {
 			html += clip.displayName;
 			html += '</td>';
 			for (let i = 0; i < beatsPerMesaure; i++) {
-				html += `<td class="note" onClick="toggleNote(this, '${clip.fileName}', ${i})">`;
+				html += `<td class="note" id="note-${clip.fileName}-${i}" onClick="toggleNote(this, '${clip.fileName}', ${i})">`;
 				html += '</td>';
 			}
 			html += '</tr>';
@@ -82,8 +88,7 @@ function onLoad() {
 		measures.innerHTML = html;
 	}
 
-	const resetButton = document.getElementById('reset-button');
-	resetButton.onclick = () => {
+	function reset() {
 		isPlaying = false;
 		clearInterval(intervalId);
 		toggleButton.innerHTML = 'GO';
@@ -97,6 +102,19 @@ function onLoad() {
 			el.classList.remove('current');
 		}
 		mesaureNum = 0;
+	}
+
+	const resetButton = document.getElementById('reset-button');
+	resetButton.onclick = reset;
+
+	const randomButton = document.getElementById('random-button');
+	randomButton.onclick = () => {
+		reset();
+		for (let i = 0; i < 20; i++) {
+			const beatNum = Math.floor(Math.random() * beatsPerMesaure);
+			const clipName = clips[Math.floor(Math.random() * clips.length)].fileName;
+			document.getElementById(`note-${clipName}-${beatNum}`).click();
+		}
 	};
 
 	const toggleButton = document.getElementById('toggle-button');

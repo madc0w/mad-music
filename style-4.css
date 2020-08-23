@@ -6,13 +6,17 @@
 	border-radius: 4px;
 }
 
+#measures-table td.beat-number {
+	text-align: center;
+}
+
 #measures-table td.current {
 	font-weight: bold;
 }
 
 #measures-table .clip-name {
 	background-color: #eee;
-	width: 100px;
+	min-width: 100px;
 	padding: 4px;
 	text-align: center;
 	font-weight: bold;
@@ -21,7 +25,7 @@
 #measures-table .note {
 	cursor: pointer;
 	background-color: #df8;
-	width: 60px;
+	width: 40px;
 	padding: 4px;
 }
 
