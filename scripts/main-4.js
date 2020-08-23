@@ -23,6 +23,9 @@ const clips = [{
 	fileName: 'gunshot',
 	displayName: 'Gunshot',
 }, {
+	fileName: 'pipe',
+	displayName: 'Pipe',
+}, {
 	fileName: 'boom',
 	displayName: 'Boom',
 }, {
@@ -53,7 +56,6 @@ const clips = [{
 	fileName: 'gong-5',
 	displayName: 'Gong 4',
 }];
-
 
 const playingClips = [];
 
