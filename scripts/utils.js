@@ -1,10 +1,11 @@
-const tempo = 2000;
+var tempo = 2000;
 const attack = 0.6;
 const decay = 0.3;
 const lowFreq = 110;
 const numWaveCompnents = 6;
 var beatsPerMesaure = 16;
 var mainLoopIntervalId;
+const baseUrl = 'https://www.gglabs.com/~mad/projects/mad-music';
 
 var playingNotesDiv, stopButton;
 const noteNames = [
@@ -52,7 +53,7 @@ function play(note, done) {
 		setTimeout(() => {
 			ramp(note, false, done);
 		}, (note.duration * tempo / beatsPerMesaure) - decay);
-	}, note.delay * tempo / beatsPerMesaure);
+	}, (note.delay || 0) * tempo / beatsPerMesaure);
 }
 
 function ramp(note, isUp, done) {

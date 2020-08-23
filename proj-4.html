@@ -4,45 +4,20 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width">
-		<title>Web dictaphone</title>
-		<link href="dictaphone.css" rel="stylesheet" type="text/css">
+		<title>Mad Music</title>
+		<link rel="stylesheet" type="text/css" href="style.css" />
+		<link rel="stylesheet" type="text/css" href="style-4.css" />
+		<script type="text/javascript" src="scripts/utils.js"></script>
+		<!-- <script type="text/javascript" src="scripts/pitch-shift.js"></script> -->
+		<script type="text/javascript" src="scripts/main-4.js"></script>
+		<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" />
 	</head>
 
-	<body>
+	<body onLoad="onLoad()">
 
-		<div class="wrapper">
-
-			<header>
-				<h1>Web dictaphone</h1>
-			</header>
-
-			<section class="main-controls">
-				<canvas class="visualizer" height="60px"></canvas>
-				<div id="buttons">
-					<button class="record">Record</button>
-					<button class="stop">Stop</button>
-				</div>
-			</section>
-
-			<section class="sound-clips">
-
-
-			</section>
-
+		<div class="main">
+			<button id="toggle-button">GO</button>
 		</div>
-
-		<label for="toggle">?</label>
-		<input type="checkbox" id="toggle">
-		<aside>
-			<h2>Information</h2>
-
-			<p>Web dictaphone is built using <a href="https://developer.mozilla.org/en-US/docs/Web/API/Navigator.getUserMedia">getUserMedia</a> and the <a
-					href="https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder_API">MediaRecorder API</a>, which provides an easier way to capture Media streams.</p>
-
-			<p>Icon courtesy of <a href="http://findicons.com/search/microphone">Find Icons</a>. Thanks to <a href="http://soledadpenades.com/">Sole</a> for the Oscilloscope code!
-			</p>
-		</aside>
-		<script src="scripts/dictaphone.js"></script>
 
 	</body>
 
