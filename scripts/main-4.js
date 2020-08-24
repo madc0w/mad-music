@@ -51,20 +51,16 @@ const clips = [
 		displayName: 'Ding',
 		type: 'rhythm',
 	}, {
-		fileName: 'gong-2',
+		fileName: 'gong-3',
 		displayName: 'Gong 1',
 		type: 'rhythm',
 	}, {
-		fileName: 'gong-3',
+		fileName: 'gong-4',
 		displayName: 'Gong 2',
 		type: 'rhythm',
 	}, {
-		fileName: 'gong-4',
-		displayName: 'Gong 3',
-		type: 'rhythm',
-	}, {
 		fileName: 'gong-5',
-		displayName: 'Gong 4',
+		displayName: 'Gong 3',
 		type: 'rhythm',
 	},
 
