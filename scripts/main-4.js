@@ -4,75 +4,113 @@ const numRandomNotes = 24;
 let mesaureNum = 0;
 let intervalId;
 let isPlaying = false;
-const clips = [{
-	fileName: 'swoosh',
-	displayName: 'Swoosh',
-	type: 'melody',
-}, {
-	fileName: 'bass-drum-1',
-	displayName: 'Bass Drum',
-	type: 'rhythm',
-}, {
-	fileName: 'snare-1',
-	displayName: 'Snare',
-	type: 'rhythm',
-}, {
-	fileName: 'hi-hat-1',
-	displayName: 'High Hat 1',
-	type: 'rhythm',
-}, {
-	fileName: 'hi-hat-2',
-	displayName: 'High Hat 2',
-	type: 'rhythm',
-}, {
-	fileName: 'gunshot',
-	displayName: 'Gunshot',
-	type: 'rhythm',
-}, {
-	fileName: 'pipe',
-	displayName: 'Pipe',
-	type: 'rhythm',
-}, {
-	fileName: 'boom',
-	displayName: 'Boom',
-	type: 'rhythm',
-}, {
-	fileName: 'boom-rattle',
-	displayName: 'Boom Rattle',
-	type: 'rhythm',
-}, {
-	fileName: 'clap-1',
-	displayName: 'Clap 1',
-	type: 'rhythm',
-}, {
-	fileName: 'clap-2',
-	displayName: 'Clap 2',
-	type: 'rhythm',
-}, {
-	fileName: 'jews-harp',
-	displayName: 'Jew\'s Harp 1',
-	type: 'rhythm',
-}, {
-	fileName: 'jews-harp-2',
-	displayName: 'Jew\'s Harp 2',
-	type: 'rhythm',
-}, {
-	fileName: 'gong-2',
-	displayName: 'Gong 1',
-	type: 'rhythm',
-}, {
-	fileName: 'gong-3',
-	displayName: 'Gong 2',
-	type: 'rhythm',
-}, {
-	fileName: 'gong-4',
-	displayName: 'Gong 3',
-	type: 'rhythm',
-}, {
-	fileName: 'gong-5',
-	displayName: 'Gong 4',
-	type: 'rhythm',
-}];
+const clips = [
+	// rhythm
+	{
+		fileName: 'bass-drum-1',
+		displayName: 'Bass Drum',
+		type: 'rhythm',
+	}, {
+		fileName: 'snare-1',
+		displayName: 'Snare',
+		type: 'rhythm',
+	}, {
+		fileName: 'hi-hat-1',
+		displayName: 'High Hat 1',
+		type: 'rhythm',
+	}, {
+		fileName: 'hi-hat-2',
+		displayName: 'High Hat 2',
+		type: 'rhythm',
+	}, {
+		fileName: 'gunshot',
+		displayName: 'Gunshot',
+		type: 'rhythm',
+	}, {
+		fileName: 'pipe',
+		displayName: 'Pipe',
+		type: 'rhythm',
+	}, {
+		fileName: 'boom',
+		displayName: 'Boom',
+		type: 'rhythm',
+	}, {
+		fileName: 'boom-rattle',
+		displayName: 'Boom Rattle',
+		type: 'rhythm',
+	}, {
+		fileName: 'clap-1',
+		displayName: 'Clap 1',
+		type: 'rhythm',
+	}, {
+		fileName: 'clap-2',
+		displayName: 'Clap 2',
+		type: 'rhythm',
+	}, {
+		fileName: 'ding',
+		displayName: 'Ding',
+		type: 'rhythm',
+	}, {
+		fileName: 'gong-2',
+		displayName: 'Gong 1',
+		type: 'rhythm',
+	}, {
+		fileName: 'gong-3',
+		displayName: 'Gong 2',
+		type: 'rhythm',
+	}, {
+		fileName: 'gong-4',
+		displayName: 'Gong 3',
+		type: 'rhythm',
+	}, {
+		fileName: 'gong-5',
+		displayName: 'Gong 4',
+		type: 'rhythm',
+	},
+
+	// melody
+	{
+		fileName: 'piano-note-high',
+		displayName: 'Piano Hi',
+		type: 'melody',
+	}, {
+		fileName: 'piano-note-low',
+		displayName: 'Piano Lo',
+		type: 'melody',
+	}, {
+		fileName: 'jews-harp',
+		displayName: 'Jew\'s Harp 1',
+		type: 'melody',
+	}, {
+		fileName: 'jews-harp-2',
+		displayName: 'Jew\'s Harp 2',
+		type: 'melody',
+	}, {
+		fileName: 'violin-note',
+		displayName: 'Violin',
+		type: 'melody',
+	}, {
+		fileName: 'wobbly-note',
+		displayName: 'Wobbly',
+		type: 'melody',
+	}, {
+		fileName: 'verbal-1',
+		displayName: 'Verbal',
+		type: 'melody',
+	}, {
+		fileName: 'short-string',
+		displayName: 'String',
+		type: 'melody',
+	}, {
+		fileName: 'echo-guitar',
+		displayName: 'Echo Guitar',
+		type: 'melody',
+	}, {
+		fileName: 'swoosh',
+		displayName: 'Swoosh',
+		type: 'melody',
+	}
+];
 
 const playingClips = [];
 
@@ -103,12 +141,6 @@ function onLoad() {
 	{
 		const melodyMeasures = document.getElementById('melody-measures-table');
 		let html = '';
-		html += '<tr>';
-		html += '<td />';
-		for (let i = 0; i < beatsPerMesaure; i++) {
-			html += `<td class="beat-number" id="beat-${i}">${i + 1}</td>`;
-		}
-		html += '</tr>';
 		for (const clip of clips.filter(c => c.type == 'melody')) {
 			html += '<tr>';
 			html += '<td class="clip-name">';
@@ -171,6 +203,7 @@ function onLoad() {
 				playingClips[beatNum].push({
 					fileName: clip.fileName,
 					pitchIndex: el.selectedIndex - 1,
+					type: 'melody',
 				});
 			}
 		}
@@ -212,7 +245,7 @@ function loop() {
 		for (clip of clips) {
 			const source = audioCtx.createBufferSource();
 			source.connect(audioCtx.destination);
-			if (clip.pitchIndex) {
+			if (clip.type == 'melody') {
 				play(clip.fileName, 1000 * buffers[clip.fileName].duration, clip.pitchIndex);
 			} else {
 				source.buffer = buffers[clip.fileName];
@@ -298,6 +331,7 @@ function melodyNoteSelected(event, fileName, index) {
 	playingClips[index].push({
 		fileName,
 		pitchIndex: el.selectedIndex - 1,
+		type: 'melody',
 	});
 }
 
