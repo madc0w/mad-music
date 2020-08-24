@@ -39,16 +39,16 @@ const clips = [
 		displayName: 'Boom Rattle',
 		type: 'rhythm',
 	}, {
+		fileName: 'ding',
+		displayName: 'Ding',
+		type: 'rhythm',
+	}, {
 		fileName: 'clap-1',
 		displayName: 'Clap 1',
 		type: 'rhythm',
 	}, {
 		fileName: 'clap-2',
 		displayName: 'Clap 2',
-		type: 'rhythm',
-	}, {
-		fileName: 'ding',
-		displayName: 'Ding',
 		type: 'rhythm',
 	}, {
 		fileName: 'gong-3',
