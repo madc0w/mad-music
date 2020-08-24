@@ -129,6 +129,8 @@ function onLoad() {
 
 	const toggleButton = document.getElementById('toggle-button');
 	toggleButton.onclick = () => {
+		// testNote();
+
 		isPlaying = !isPlaying;
 		toggleButton.innerHTML = isPlaying ? 'STOP' : 'GO';
 		if (isPlaying) {
@@ -160,7 +162,7 @@ function loop() {
 		for (clip of clips) {
 			const source = audioCtx.createBufferSource();
 			source.connect(audioCtx.destination);
-			source.buffer = buffers[clip];
+			source.buffer = buffers[clip.fileName];
 			source.start();
 		}
 	}
@@ -193,9 +195,37 @@ function toggleNote(el, fileName, index) {
 	if (!playingClips[index]) {
 		playingClips[index] = [];
 	}
-	if (playingClips[index].includes(fileName)) {
-		playingClips[index] = playingClips[index].filter(fn => fn != fileName);
+	if (playingClips[index].find(c => c.fileName == fileName)) {
+		playingClips[index] = playingClips[index].filter(c => c.fileName != fileName);
 	} else {
-		playingClips[index].push(fileName);
+		playingClips[index].push({
+			fileName
+		});
 	}
+}
+
+function testNote() {
+	const buffer = buffers['jews-harp'];
+	const durationTime = 600;
+	for (let i in noteNames) {
+		setTimeout(() => {
+			play(buffer, durationTime, i);
+		}, i * durationTime);
+	}
+}
+
+function play(buffer, durationTime, pitchIndex) {
+	console.log(noteNames[pitchIndex]);
+	const pitchShift = Math.pow(2, (pitchIndex - noteNames.length / 2) / 12) * durationTime / (1000 * buffer.duration);
+	const playbackRate = 1000 * buffer.duration / durationTime;
+	const source = audioCtx.createBufferSource();
+	source.playbackRate.value = playbackRate;
+	const inData = buffer.getChannelData(0);
+	const inDataCopy = new Float32Array(inData);
+	PitchShift(pitchShift, inDataCopy.length, 1024, 10, audioCtx.sampleRate, inDataCopy);
+	const audioBufferCopy = audioCtx.createBuffer(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
+	audioBufferCopy.copyToChannel(inDataCopy, 0);
+	source.buffer = audioBufferCopy;
+	source.connect(audioCtx.destination);
+	source.start();
 }
