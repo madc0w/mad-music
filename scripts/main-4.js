@@ -2,7 +2,7 @@ var tempo = 200;
 const numRandomNotes = 24;
 
 let mesaureNum = 0;
-let intervalId;
+let intervalId, evolutionIntervalId;
 let isPlaying = false;
 const clips = [
 	// rhythm
@@ -109,10 +109,31 @@ const clips = [
 ];
 
 const playingClips = [];
-
 const buffers = {};
 
 function onLoad() {
+	{
+		const evolveCheckbox = document.getElementById('evolve-checkbox');
+		const evolveSlider = document.getElementById('evolution-slider');
+		const evolveSliderContainer = document.getElementById('evolution-slider-container');
+		function evolve() {
+			addRandomNote();
+			removeRandomNote();
+		};
+		evolveSlider.onchange = () => {
+			clearInterval(evolutionIntervalId);
+			evolutionIntervalId = setInterval(evolve, 2000 - evolveSlider.value * 200);
+		};
+		evolveCheckbox.onchange = () => {
+			clearInterval(evolutionIntervalId);
+			if (evolveCheckbox.checked) {
+				evolveSliderContainer.style = 'display: inline;';
+				evolutionIntervalId = setInterval(evolve, 2000 - evolveSlider.value * 200);
+			} else {
+				evolveSliderContainer.style = 'display: none;';
+			}
+		};
+	}
 	{
 		const rhythmMeasures = document.getElementById('rhythm-measures-table');
 		let html = '';
@@ -164,6 +185,7 @@ function onLoad() {
 	function reset() {
 		isPlaying = false;
 		clearInterval(intervalId);
+		clearInterval(evolutionIntervalId);
 		toggleButton.innerHTML = 'GO';
 		playingClips.splice(0, playingClips.length);
 		const noteEls = document.getElementsByClassName('note');
@@ -185,25 +207,7 @@ function onLoad() {
 	randomButton.onclick = () => {
 		reset();
 		for (let i = 0; i < numRandomNotes; i++) {
-			const beatNum = Math.floor(Math.random() * beatsPerMesaure);
-			const clip = clips[Math.floor(Math.random() * clips.length)];
-			const el = document.getElementById(`note-${clip.fileName}-${beatNum}`);
-			if (clip.type == 'rhythm') {
-				el.click();
-			} else {
-				el.classList.add('selected');
-				const pitchIndex = Math.floor(Math.random() * noteNames.length);
-				const note = noteNames[pitchIndex];
-				el.innerHTML = note;
-				if (!playingClips[beatNum]) {
-					playingClips[beatNum] = [];
-				}
-				playingClips[beatNum].push({
-					fileName: clip.fileName,
-					pitchIndex: el.selectedIndex - 1,
-					type: 'melody',
-				});
-			}
+			addRandomNote();
 		}
 		toggleButton.onclick();
 	};
@@ -218,6 +222,7 @@ function onLoad() {
 			intervalId = setInterval(loop, tempo);
 		} else {
 			clearInterval(intervalId);
+			clearInterval(evolutionIntervalId);
 		}
 	};
 
@@ -368,4 +373,46 @@ function play(bufferName, durationTime, pitchIndex) {
 	source.buffer = audioBufferCopy;
 	source.connect(audioCtx.destination);
 	source.start();
+}
+
+function addRandomNote() {
+	const beatNum = Math.floor(Math.random() * beatsPerMesaure);
+	const clip = clips[Math.floor(Math.random() * clips.length)];
+	const el = document.getElementById(`note-${clip.fileName}-${beatNum}`);
+	if (clip.type == 'rhythm') {
+		el.click();
+	} else {
+		el.classList.add('selected');
+		const pitchIndex = Math.floor(Math.random() * noteNames.length);
+		const note = noteNames[pitchIndex];
+		el.innerHTML = note;
+		if (!playingClips[beatNum]) {
+			playingClips[beatNum] = [];
+		}
+		playingClips[beatNum].push({
+			fileName: clip.fileName,
+			pitchIndex: el.selectedIndex - 1,
+			type: 'melody',
+		});
+	}
+}
+
+function removeRandomNote() {
+	const notes = [];
+	for (let i in playingClips) {
+		for (const c of playingClips[i]) {
+			notes.push({
+				i,
+				fileName: c.fileName,
+			});
+		}
+	}
+	if (notes.length > 0) {
+		const toRemove = notes[Math.floor(Math.random() * notes.length)];
+		const removingClip = playingClips[toRemove.i].find(c => c.fileName == toRemove.fileName);
+		const el = document.getElementById(`note-${removingClip.fileName}-${toRemove.i}`);
+		el.innerHTML = '';
+		el.classList.remove('selected');
+		playingClips[toRemove.i] = playingClips[toRemove.i].filter(c => c.fileName != toRemove.fileName);
+	}
 }

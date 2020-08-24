@@ -51,10 +51,23 @@
 }
 
 #tempo-slider-container {
-	margin-top: 12px;
 	font-weight: bold;
 	display: inline;
 	margin-left: 18px;
+}
+
+#evolve-container {
+	font-weight: bold;
+	display: inline;
+	margin-left: 18px;
+}
+
+#evolution-slider-container {
+	display: none;
+}
+
+#evolution-slider-container span {
+	font-weight: normal;
 }
 
 #tempo-slider {
