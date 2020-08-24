@@ -1,24 +1,22 @@
-#measures-table {
+#mesure-tables table {
 	margin-top: 22px;
 }
 
-#measures-table td {
+#mesure-tables table td {
 	border-radius: 4px;
-}
-
-#measures-table td.beat-number {
 	text-align: center;
+	color: #222;
 }
 
-#measures-table td.current {
+#mesure-tables table td.current {
 	font-weight: bold;
 }
 
-#measures-table td.note.current {
+#mesure-tables table td.note.current {
 	opacity: 0.55;
 }
 
-#measures-table .clip-name {
+#mesure-tables table .clip-name {
 	background-color: #eee;
 	min-width: 100px;
 	padding: 4px;
@@ -26,18 +24,18 @@
 	font-weight: bold;
 }
 
-#measures-table .note {
+#mesure-tables table .note {
 	cursor: pointer;
 	background-color: #df8;
 	width: 40px;
 	padding: 4px;
 }
 
-#measures-table .note:hover {
+#mesure-tables table .note:hover {
 	background-color: #4d4;
 }
 
-#measures-table .note.selected {
+#mesure-tables table .note.selected {
 	background-color: #4d4;
 }
 
