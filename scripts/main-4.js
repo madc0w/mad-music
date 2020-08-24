@@ -90,10 +90,6 @@ const clips = [
 		displayName: 'Wobbly',
 		type: 'melody',
 	}, {
-		fileName: 'verbal-1',
-		displayName: 'Verbal',
-		type: 'melody',
-	}, {
 		fileName: 'short-string',
 		displayName: 'String',
 		type: 'melody',
@@ -104,6 +100,10 @@ const clips = [
 	}, {
 		fileName: 'swoosh',
 		displayName: 'Swoosh',
+		type: 'melody',
+	}, {
+		fileName: 'verbal-1',
+		displayName: 'Verbal',
 		type: 'melody',
 	}
 ];
@@ -116,7 +116,7 @@ function onLoad() {
 	{
 		const rhythmMeasures = document.getElementById('rhythm-measures-table');
 		let html = '';
-		html += '<caption>Instant music! Just add rhythm...</caption>';
+		html += '<caption>Instant music. Just add rhythm...</caption>';
 		html += '<tr>';
 		html += '<td />';
 		for (let i = 0; i < beatsPerMesaure; i++) {
@@ -125,11 +125,11 @@ function onLoad() {
 		html += '</tr>';
 		for (const clip of clips.filter(c => c.type == 'rhythm')) {
 			html += '<tr>';
-			html += '<td class="clip-name">';
+			html += `<td class="clip-name" id="clip-name-${clip.fileName}">`;
 			html += clip.displayName;
 			html += '</td>';
 			for (let i = 0; i < beatsPerMesaure; i++) {
-				html += `<td class="note beat-${i}" id="note-${clip.fileName}-${i}" onClick="toggleNote(this, '${clip.fileName}', ${i})"/>`;
+				html += `<td class="note beat-${i}" id="note-${clip.fileName}-${i}" onClick="toggleNote(this, '${clip.fileName}', ${i})" onMouseOut="mouseOutCell(this, '${clip.fileName}')" onMouseOver="mouseOverCell(this, '${clip.fileName}')"/>`;
 			}
 			html += '</tr>';
 		}
@@ -141,11 +141,11 @@ function onLoad() {
 		html += '<caption>And melody!</caption>';
 		for (const clip of clips.filter(c => c.type == 'melody')) {
 			html += '<tr>';
-			html += '<td class="clip-name">';
+			html += `<td class="clip-name" id="clip-name-${clip.fileName}">`;
 			html += clip.displayName;
 			html += '</td>';
 			for (let i = 0; i < beatsPerMesaure; i++) {
-				html += `<td class="note beat-${i}" id="note-${clip.fileName}-${i}" onClick="toggleMelodyNote(event, '${clip.fileName}', ${i})"/>`;
+				html += `<td class="note beat-${i}" id="note-${clip.fileName}-${i}" onClick="toggleMelodyNote(event, '${clip.fileName}', ${i})" onMouseOut="mouseOutCell(this, '${clip.fileName}')" onMouseOver="mouseOverCell(this, '${clip.fileName}')"/>`;
 			}
 			html += '</tr>';
 		}
@@ -331,6 +331,17 @@ function melodyNoteSelected(event, fileName, index) {
 		pitchIndex: el.selectedIndex - 1,
 		type: 'melody',
 	});
+}
+
+
+function mouseOverCell(el, fileName) {
+	const cell = document.getElementById(`clip-name-${fileName}`);
+	cell.classList.add('selected');
+}
+
+function mouseOutCell(el, fileName) {
+	const cell = document.getElementById(`clip-name-${fileName}`);
+	cell.classList.remove('selected');
 }
 
 function testNote() {

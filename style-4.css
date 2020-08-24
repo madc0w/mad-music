@@ -6,11 +6,11 @@
 	text-align: left;
 	font-weight: bold;
 	margin-bottom: 4px;
-	margin-left: 14px;
+	margin-left: 24px;
 }
 
 #mesure-tables table td {
-	border-radius: 4px;
+	border-radius: 8px;
 	text-align: center;
 	color: #222;
 }
@@ -24,11 +24,15 @@
 }
 
 #mesure-tables table .clip-name {
-	background-color: #eee;
+	background-color: #ddd;
 	min-width: 100px;
 	padding: 4px;
 	text-align: center;
 	font-weight: bold;
+}
+
+#mesure-tables table .clip-name.selected {
+	background-color: #fff;
 }
 
 #mesure-tables table .note {
