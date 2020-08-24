@@ -156,8 +156,23 @@ function onLoad() {
 		reset();
 		for (let i = 0; i < numRandomNotes; i++) {
 			const beatNum = Math.floor(Math.random() * beatsPerMesaure);
-			const clipName = clips[Math.floor(Math.random() * clips.length)].fileName;
-			document.getElementById(`note-${clipName}-${beatNum}`).click();
+			const clip = clips[Math.floor(Math.random() * clips.length)];
+			const el = document.getElementById(`note-${clip.fileName}-${beatNum}`);
+			if (clip.type == 'rhythm') {
+				el.click();
+			} else {
+				el.classList.toggle('selected');
+				const pitchIndex = Math.floor(Math.random() * noteNames.length);
+				const note = noteNames[pitchIndex];
+				el.innerHTML = note;
+				if (!playingClips[beatNum]) {
+					playingClips[beatNum] = [];
+				}
+				playingClips[beatNum].push({
+					fileName: clip.fileName,
+					pitchIndex: el.selectedIndex - 1,
+				});
+			}
 		}
 		toggleButton.onclick();
 	};
@@ -256,6 +271,7 @@ function toggleMelodyNote(event, fileName, index) {
 			el.innerHTML = '';
 		} else {
 			let html = `<select onChange="melodyNoteSelected(event, '${fileName}', ${index})">`;
+			html += `<option>-</option>`;
 			for (const note of noteNames) {
 				html += `<option>${note}</option>`;
 			}
@@ -281,7 +297,7 @@ function melodyNoteSelected(event, fileName, index) {
 	el.parentNode.innerHTML = el.selectedOptions[0].innerHTML;
 	playingClips[index].push({
 		fileName,
-		pitchIndex: el.selectedIndex,
+		pitchIndex: el.selectedIndex - 1,
 	});
 }
 
@@ -295,7 +311,7 @@ function testNote() {
 }
 
 function play(bufferName, durationTime, pitchIndex) {
-	console.log(noteNames[pitchIndex]);
+	// console.log(noteNames[pitchIndex]);
 	const buffer = buffers[bufferName];
 	const pitchShift = Math.pow(2, (pitchIndex - noteNames.length / 2) / 12) * durationTime / (1000 * buffer.duration);
 	const playbackRate = 1000 * buffer.duration / durationTime;
