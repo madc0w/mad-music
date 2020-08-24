@@ -15,9 +15,7 @@
 }
 
 #measures-table td.note.current {
-	border-style: solid;
-	border-color: #222;
-	border-width: 2px;
+	opacity: 0.55;
 }
 
 #measures-table .clip-name {
