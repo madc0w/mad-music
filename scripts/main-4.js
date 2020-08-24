@@ -16,11 +16,11 @@ const clips = [
 		type: 'rhythm',
 	}, {
 		fileName: 'hi-hat-1',
-		displayName: 'High Hat 1',
+		displayName: 'Hi-hat Closed',
 		type: 'rhythm',
 	}, {
 		fileName: 'hi-hat-2',
-		displayName: 'High Hat 2',
+		displayName: 'Hi-hat Open',
 		type: 'rhythm',
 	}, {
 		fileName: 'gunshot',
@@ -67,11 +67,11 @@ const clips = [
 	// melody
 	{
 		fileName: 'piano-note-high',
-		displayName: 'Piano Hi',
+		displayName: 'Piano High',
 		type: 'melody',
 	}, {
 		fileName: 'piano-note-low',
-		displayName: 'Piano Lo',
+		displayName: 'Piano Low',
 		type: 'melody',
 	}, {
 		fileName: 'jews-harp',
@@ -116,6 +116,7 @@ function onLoad() {
 	{
 		const rhythmMeasures = document.getElementById('rhythm-measures-table');
 		let html = '';
+		html += '<caption>Instant music! Just add rhythm...</caption>';
 		html += '<tr>';
 		html += '<td />';
 		for (let i = 0; i < beatsPerMesaure; i++) {
@@ -137,6 +138,7 @@ function onLoad() {
 	{
 		const melodyMeasures = document.getElementById('melody-measures-table');
 		let html = '';
+		html += '<caption>And melody!</caption>';
 		for (const clip of clips.filter(c => c.type == 'melody')) {
 			html += '<tr>';
 			html += '<td class="clip-name">';
