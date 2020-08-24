@@ -193,7 +193,7 @@ function onLoad() {
 			if (clip.type == 'rhythm') {
 				el.click();
 			} else {
-				el.classList.toggle('selected');
+				el.classList.add('selected');
 				const pitchIndex = Math.floor(Math.random() * noteNames.length);
 				const note = noteNames[pitchIndex];
 				el.innerHTML = note;
