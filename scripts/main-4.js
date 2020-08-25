@@ -108,24 +108,74 @@ const clips = [
 	}
 ];
 
-const playingClips = [];
 const buffers = {};
-let selectedFileName, selectedMelodyBeatNum, melodyNoteCell;
+let playingClips = [];
+let selectedFileName, selectedMelodyBeatNum, melodyNoteCell, toggleButton;
 
 function onLoad() {
+	{
+		document.getElementById('save-button').onclick = event => {
+			const saved = localStorage.saved ? JSON.parse(localStorage.saved) : {};
+			saved[document.getElementById('save-name').value] = {
+				date: new Date().getTime(),
+				playingClips,
+				tempo,
+			};
+			localStorage.saved = JSON.stringify(saved);
+			closeAll();
+		};
+	}
+
+	const saveModal = document.getElementById('save-modal');
+	const loadModal = document.getElementById('load-modal');
+	document.getElementById('open-load-button').onclick = event => {
+		setTimeout(() => {
+			const table = document.getElementById('compositions-list');
+			let html = '';
+			html += '<tr><th>Date</th><th>Name</th></tr>';
+			const allCompositions = JSON.parse(JSON.stringify(sampleCompositions));
+			const saved = localStorage.saved ? JSON.parse(localStorage.saved) : {};
+			for (const name in saved) {
+				allCompositions[name] = saved[name];
+			}
+			for (const name in allCompositions) {
+				html += `<tr class="row" onClick="load('${name}')">`;
+				const date = new Date(allCompositions[name].date);
+				const dateStr = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
+				html += `<td>${dateStr}</td>`;
+				html += `<td>${name}</td>`;
+				html += '</tr>';
+			}
+			table.innerHTML = html;
+			loadModal.classList.remove('hidden');
+		}, 20);
+	};
+	document.getElementById('open-save-button').onclick = event => {
+		setTimeout(() => {
+			saveModal.classList.remove('hidden');
+			document.getElementById('save-name').focus();
+		}, 20);
+	};
+
 	const noteSelectionDiv = document.getElementById('note-selection');
-	function closeNoteSelection() {
+	function closeAll() {
 		noteSelectionDiv.classList.add('hidden');
+		saveModal.classList.add('hidden');
+		loadModal.classList.add('hidden');
 		if (melodyNoteCell) {
 			melodyNoteCell.classList.remove('selecting');
 		}
 	}
 	document.onkeyup = event => {
 		if (event.key == 'Escape') {
-			closeNoteSelection();
+			closeAll();
 		}
 	};
-	document.onclick = closeNoteSelection;
+	document.onclick = event => {
+		if (event.target.tagName != 'INPUT') {
+			closeAll();
+		}
+	};
 
 	{
 		let html = '';
@@ -208,24 +258,6 @@ function onLoad() {
 		}
 	};
 
-	function reset() {
-		isPlaying = false;
-		clearInterval(intervalId);
-		clearInterval(evolutionIntervalId);
-		toggleButton.innerHTML = 'GO';
-		playingClips.splice(0, playingClips.length);
-		const noteEls = document.getElementsByClassName('note');
-		for (const el of noteEls) {
-			el.classList.remove('selected');
-			el.innerHTML = '';
-		}
-		const beatNumEls = document.getElementsByClassName('beat-number');
-		for (const el of beatNumEls) {
-			el.classList.remove('current');
-		}
-		mesaureNum = 0;
-	}
-
 	const resetButton = document.getElementById('reset-button');
 	resetButton.onclick = reset;
 
@@ -238,7 +270,7 @@ function onLoad() {
 		toggleButton.onclick();
 	};
 
-	const toggleButton = document.getElementById('toggle-button');
+	toggleButton = document.getElementById('toggle-button');
 	toggleButton.onclick = () => {
 		// testNote();
 
@@ -444,4 +476,41 @@ function removeRandomNote() {
 		el.classList.remove('selected');
 		playingClips[toRemove.i] = playingClips[toRemove.i].filter(c => c.fileName != toRemove.fileName);
 	}
+}
+
+function load(name) {
+	reset();
+	const composition = (localStorage.saved && JSON.parse(localStorage.saved)[name]) || sampleCompositions[name];
+	tempo = composition.tempo;
+	document.getElementById('tempo-slider').value = tempo.toString();
+	playingClips = composition.playingClips;
+	for (let beatNum in playingClips) {
+		if (playingClips[beatNum]) {
+			for (let note of playingClips[beatNum]) {
+				const cell = document.getElementById(`note-${note.fileName}-${beatNum}`);
+				cell.classList.add('selected');
+				if (note.type == 'melody') {
+					cell.innerHTML = noteNames[note.pitchIndex];
+				}
+			}
+		}
+	}
+}
+
+function reset() {
+	isPlaying = false;
+	clearInterval(intervalId);
+	clearInterval(evolutionIntervalId);
+	toggleButton.innerHTML = 'GO';
+	playingClips.splice(0, playingClips.length);
+	const noteEls = document.getElementsByClassName('note');
+	for (const el of noteEls) {
+		el.classList.remove('selected');
+		el.innerHTML = '';
+	}
+	const beatNumEls = document.getElementsByClassName('beat-number');
+	for (const el of beatNumEls) {
+		el.classList.remove('current');
+	}
+	mesaureNum = 0;
 }

@@ -78,7 +78,7 @@
 	width: 200px;
 }
 
-#note-selection {
+.modal {
 	z-index: 100;
 	position: absolute;
 	background-color: white;
@@ -87,11 +87,53 @@
 	border-color: #222;
 	border-width: 1px;
 	padding: 8px;
+	top: 100px;
+	box-shadow: 10px 15px 24px 0px rgba(0, 0, 0, 0.4);
+}
+
+.modal-header {
+	font-weight: bold;
+	font-size: 22px;
+	text-decoration: underline;
+	margin-bottom: 12px;
+}
+
+#save-modal {
+	left: calc(50% - 140px);
+	width: 280px;
+}
+
+#load-modal {
+	left: calc(50% - 140px);
+	width: 280px;
+}
+
+#save-modal button {
+	margin-left: 90px;
+	width: 100px;
+	margin-top: 12px;
+}
+
+#compositions-list {
+	width: 90%;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #222;
+}
+
+#compositions-list tr.row:hover {
+	background-color: #ddd;
+	cursor: pointer;
+}
+
+#save-modal input {
+	width: 90%;
+}
+
+#note-selection {
 	width: 80px;
 	text-align: center;
-	top: 100px;
 	left: calc(50% - 40px);
-	box-shadow: 10px 15px 24px 0px rgba(0, 0, 0, 0.4);
 }
 
 #note-selection .col {
@@ -106,6 +148,18 @@
 #note-selection .col div:hover {
 	font-weight: bold;
 	background-color: #eee;
+}
+
+#open-load-button img,
+#open-save-button img {
+	width: 32px;
+	cursor: pointer;
+}
+
+#open-load-button,
+#open-save-button {
+	vertical-align: middle;
+	margin-left: 8px;
 }
 
 button {
