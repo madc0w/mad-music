@@ -79,6 +79,7 @@
 }
 
 #note-selection {
+	z-index: 100;
 	position: absolute;
 	background-color: white;
 	border-radius: 12px;

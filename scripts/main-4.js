@@ -114,14 +114,18 @@ let selectedFileName, selectedMelodyBeatNum, melodyNoteCell;
 
 function onLoad() {
 	const noteSelectionDiv = document.getElementById('note-selection');
+	function closeNoteSelection() {
+		noteSelectionDiv.classList.add('hidden');
+		if (melodyNoteCell) {
+			melodyNoteCell.classList.remove('selecting');
+		}
+	}
 	document.onkeyup = event => {
 		if (event.key == 'Escape') {
-			noteSelectionDiv.classList.add('hidden');
-			if (melodyNoteCell) {
-				melodyNoteCell.classList.remove('selecting');
-			}
+			closeNoteSelection();
 		}
 	};
+	document.onclick = closeNoteSelection;
 
 	{
 		let html = '';
@@ -328,18 +332,20 @@ function toggleMelodyNote(event, fileName, index) {
 			playingClips[index] = playingClips[index].filter(c => c.fileName != fileName);
 			el.innerHTML = '';
 		} else {
-			el.classList.add('selecting');
-			selectedFileName = fileName;
-			selectedMelodyBeatNum = index;
-			melodyNoteCell = el;
-			const noteSelectionDiv = document.getElementById('note-selection');
-			noteSelectionDiv.classList.remove('hidden');
-			const height = parseInt(document.defaultView.getComputedStyle(noteSelectionDiv).height);
-			const width = parseInt(document.defaultView.getComputedStyle(noteSelectionDiv).width);
-			const y = Math.min(event.y, innerHeight - height) - 24;
-			const x = Math.min(event.x + 18, innerWidth - width - 24);
-			noteSelectionDiv.style.top = `${y}px`;
-			noteSelectionDiv.style.left = `${x}px`;
+			setTimeout(() => {
+				el.classList.add('selecting');
+				selectedFileName = fileName;
+				selectedMelodyBeatNum = index;
+				melodyNoteCell = el;
+				const noteSelectionDiv = document.getElementById('note-selection');
+				noteSelectionDiv.classList.remove('hidden');
+				const height = parseInt(document.defaultView.getComputedStyle(noteSelectionDiv).height);
+				const width = parseInt(document.defaultView.getComputedStyle(noteSelectionDiv).width);
+				const y = Math.min(event.y, innerHeight - height) - 24;
+				const x = Math.min(event.x + 18, innerWidth - width - 24);
+				noteSelectionDiv.style.top = `${y}px`;
+				noteSelectionDiv.style.left = `${x}px`;
+			}, 20);
 		}
 	}
 }
