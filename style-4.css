@@ -50,6 +50,10 @@
 	background-color: #4d4;
 }
 
+#mesure-tables table .note.selecting {
+	background-color: #8e8;
+}
+
 #tempo-slider-container {
 	font-weight: bold;
 	display: inline;

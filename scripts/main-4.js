@@ -113,9 +113,17 @@ const buffers = {};
 let selectedFileName, selectedMelodyBeatNum, melodyNoteCell;
 
 function onLoad() {
+	const noteSelectionDiv = document.getElementById('note-selection');
+	document.onkeyup = event => {
+		if (event.key == 'Escape') {
+			noteSelectionDiv.classList.add('hidden');
+			if (melodyNoteCell) {
+				melodyNoteCell.classList.remove('selecting');
+			}
+		}
+	};
 
 	{
-		const noteSelectionDiv = document.getElementById('note-selection');
 		let html = '';
 		for (let col = 0; col < 2; col++) {
 			html += '<div class="col">';
@@ -136,13 +144,13 @@ function onLoad() {
 		};
 		evolveSlider.onchange = () => {
 			clearInterval(evolutionIntervalId);
-			evolutionIntervalId = setInterval(evolve, 2000 - evolveSlider.value * 200);
+			evolutionIntervalId = setInterval(evolve, 8000 - evolveSlider.value * tempo);
 		};
 		evolveCheckbox.onchange = () => {
 			clearInterval(evolutionIntervalId);
 			if (evolveCheckbox.checked) {
 				evolveSliderContainer.classList.remove('hidden');
-				evolutionIntervalId = setInterval(evolve, 2000 - evolveSlider.value * 200);
+				evolutionIntervalId = setInterval(evolve, 8000 - evolveSlider.value * tempo);
 			} else {
 				evolveSliderContainer.classList.add('hidden');
 			}
@@ -312,14 +320,15 @@ function toggleMelodyNote(event, fileName, index) {
 	const el = event.target;
 	if (el.tagName == 'TD') {
 		const isSelected = el.classList.contains('selected');
-		el.classList.toggle('selected');
 		if (!playingClips[index]) {
 			playingClips[index] = [];
 		}
 		if (isSelected) {
+			el.classList.remove('selected');
 			playingClips[index] = playingClips[index].filter(c => c.fileName != fileName);
 			el.innerHTML = '';
 		} else {
+			el.classList.add('selecting');
 			selectedFileName = fileName;
 			selectedMelodyBeatNum = index;
 			melodyNoteCell = el;
@@ -331,24 +340,6 @@ function toggleMelodyNote(event, fileName, index) {
 			const x = Math.min(event.x + 18, innerWidth - width - 24);
 			noteSelectionDiv.style.top = `${y}px`;
 			noteSelectionDiv.style.left = `${x}px`;
-
-			// let html = `<select onChange="melodyNoteSelected(event, '${fileName}', ${index})">`;
-			// html += `<option>-</option>`;
-			// for (const note of noteNames) {
-			// 	html += `<option>${note}</option>`;
-			// }
-			// html += '</select>';
-			// el.innerHTML = html;
-
-			// no.
-			// el.childNodes[0].click();
-			// nope also:
-			// setTimeout(() => {
-			// 	const mouseEvent = document.createEvent('MouseEvents');
-			// 	mouseEvent.initMouseEvent('mousedown', true, true, window);
-			// 	el.childNodes[0].dispatchEvent(mouseEvent);
-			// }, 100);
-			// see https://stackoverflow.com/questions/430237/is-it-possible-to-use-js-to-open-an-html-select-to-show-its-option-list
 		}
 	}
 }
@@ -358,6 +349,8 @@ function melodyNoteSelected(event, pitchIndex) {
 	document.getElementById('note-selection').classList.add('hidden');
 	const el = event.target;
 	melodyNoteCell.innerHTML = el.innerHTML;
+	melodyNoteCell.classList.remove('selecting');
+	melodyNoteCell.classList.add('selected');
 	if (!playingClips[selectedMelodyBeatNum]) {
 		playingClips[selectedMelodyBeatNum] = [];
 	}
