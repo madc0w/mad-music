@@ -38,8 +38,14 @@
 				<button id="toggle-button">GO</button>
 				<button id="random-button">Random!</button>
 				<button id="reset-button">Reset</button>
-				<span id="open-load-button"><img src="icons/load-24px.svg" alt="Load music" /></span>
-				<span id="open-save-button"><img src="icons/save-24px.svg" alt="Save music" /></span>
+				<div id="open-load-button" class="control-button">
+					<img src="icons/load-24px.svg" alt="Load music" />
+					<div>Load</div>
+				</div>
+				<div id="open-save-button" class="control-button">
+					<img src="icons/save-24px.svg" alt="Save music" />
+					<div>Save</div>
+				</div>
 				<div id="tempo-slider-container">
 					<label for="tempo-slider">Tempo</label>
 					<input type="range" min="100" max="800" value="600" id="tempo-slider" />

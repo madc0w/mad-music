@@ -78,6 +78,16 @@
 	font-weight: normal;
 }
 
+.control-button {
+	display: inline-block;
+	font-size: 12px;
+	text-align: center;
+	position: relative;
+	top: 16px;
+	cursor: pointer;
+	margin-left: 12px;
+}
+
 .modal {
 	z-index: 100;
 	position: absolute;
@@ -154,12 +164,6 @@
 #open-save-button img {
 	width: 32px;
 	cursor: pointer;
-}
-
-#open-load-button,
-#open-save-button {
-	vertical-align: middle;
-	margin-left: 8px;
 }
 
 #byline {
