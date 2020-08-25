@@ -56,8 +56,10 @@
 
 #tempo-slider-container {
 	font-weight: bold;
-	display: inline;
+	display: inline-block;
 	margin-left: 18px;
+	margin-top: 18px;
+	vertical-align: top;
 }
 
 #tempo-slider {
@@ -68,6 +70,8 @@
 	font-weight: bold;
 	display: inline-block;
 	margin-left: 18px;
+	margin-top: 18px;
+	vertical-align: top;
 }
 
 #evolution-slider-container {

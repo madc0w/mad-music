@@ -202,6 +202,7 @@ function onLoad() {
 		};
 		evolveCheckbox.onchange = () => {
 			clearInterval(evolutionIntervalId);
+			evolutionIntervalId = null;
 			if (evolveCheckbox.checked) {
 				evolveSliderContainer.classList.remove('hidden');
 				evolutionIntervalId = setInterval(evolve, 8000 - evolveSlider.value * tempo);
@@ -280,7 +281,9 @@ function onLoad() {
 			intervalId = setInterval(loop, tempo);
 		} else {
 			clearInterval(intervalId);
+			intervalId = null;
 			clearInterval(evolutionIntervalId);
+			evolutionIntervalId = null;
 		}
 	};
 
@@ -300,6 +303,10 @@ function onLoad() {
 }
 
 function loop() {
+	if (document.getElementById('evolve-checkbox').checked && !evolutionIntervalId) {
+		evolutionIntervalId = setInterval(evolve, 8000 - evolveSlider.value * tempo);
+	}
+
 	const beatNum = mesaureNum % beatsPerMesaure;
 	const clips = playingClips[beatNum];
 	if (clips) {
@@ -509,7 +516,9 @@ function load(name) {
 function reset() {
 	isPlaying = false;
 	clearInterval(intervalId);
+	intervalId = null;
 	clearInterval(evolutionIntervalId);
+	evolutionIntervalId = null;
 	toggleButton.innerHTML = 'GO';
 	playingClips = [];
 	const noteEls = document.getElementsByClassName('note');
