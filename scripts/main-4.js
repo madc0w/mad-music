@@ -303,7 +303,7 @@ function loop() {
 	const beatNum = mesaureNum % beatsPerMesaure;
 	const clips = playingClips[beatNum];
 	if (clips) {
-		for (clip of clips) {
+		for (let clip of clips) {
 			const source = audioCtx.createBufferSource();
 			source.connect(audioCtx.destination);
 			if (clip.type == 'melody') {
@@ -347,7 +347,9 @@ function toggleNote(el, fileName, index) {
 		playingClips[index] = playingClips[index].filter(c => c.fileName != fileName);
 	} else {
 		playingClips[index].push({
-			fileName
+			id: Math.floor(Math.random() * 1e12),
+			type: 'rhythm',
+			fileName,
 		});
 	}
 }
@@ -393,9 +395,10 @@ function melodyNoteSelected(event, pitchIndex) {
 		playingClips[selectedMelodyBeatNum] = [];
 	}
 	playingClips[selectedMelodyBeatNum].push({
+		id: Math.floor(Math.random() * 1e12),
+		type: 'melody',
 		fileName: selectedFileName,
 		pitchIndex,
-		type: 'melody',
 	});
 }
 
@@ -410,20 +413,27 @@ function mouseOutCell(el, fileName) {
 	cell.classList.remove('selected');
 }
 
+const shiftedBuffers = {};
 function play(clip) {
-	const durationTime = 1000 * buffers[clip.fileName].duration;
-	// console.log(noteNames[pitchIndex]);
-	const buffer = buffers[clip.fileName];
-	const pitchShift = Math.pow(2, (clip.pitchIndex - noteNames.length / 2) / 12) * durationTime / (1000 * buffer.duration);
-	const playbackRate = 1000 * buffer.duration / durationTime;
 	const source = audioCtx.createBufferSource();
-	source.playbackRate.value = playbackRate;
-	const inData = buffer.getChannelData(0);
-	const inDataCopy = new Float32Array(inData);
-	PitchShift(pitchShift, inDataCopy.length, 1024, 10, audioCtx.sampleRate, inDataCopy);
-	const audioBufferCopy = audioCtx.createBuffer(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
-	audioBufferCopy.copyToChannel(inDataCopy, 0);
-	source.buffer = audioBufferCopy;
+	let shiftedBuffer;
+	if (shiftedBuffers[clip.id]) {
+		shiftedBuffer = shiftedBuffers[clip.id];
+	} else {
+		const durationTime = 1000 * buffers[clip.fileName].duration;
+		// console.log(noteNames[pitchIndex]);
+		const buffer = buffers[clip.fileName];
+		const pitchShift = Math.pow(2, (clip.pitchIndex - noteNames.length / 2) / 12) * durationTime / (1000 * buffer.duration);
+		const playbackRate = 1000 * buffer.duration / durationTime;
+		source.playbackRate.value = playbackRate;
+		const inData = buffer.getChannelData(0);
+		const inDataCopy = new Float32Array(inData);
+		PitchShift(pitchShift, inDataCopy.length, 1024, 10, audioCtx.sampleRate, inDataCopy);
+		shiftedBuffer = audioCtx.createBuffer(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
+		shiftedBuffer.copyToChannel(inDataCopy, 0);
+		shiftedBuffers[clip.id] = shiftedBuffer;
+	}
+	source.buffer = shiftedBuffer;
 	source.connect(audioCtx.destination);
 	source.start();
 }
@@ -472,7 +482,14 @@ function removeRandomNote() {
 
 function load(name) {
 	reset();
-	const composition = (localStorage.saved && JSON.parse(localStorage.saved)[name]) || sampleCompositions[name];
+	let composition = (localStorage.saved && JSON.parse(localStorage.saved)[name]);
+	const saveNameInput = document.getElementById('save-name');
+	if (composition) {
+		saveNameInput.value = name;
+	} else {
+		composition = sampleCompositions[name];
+		saveNameInput.value = name + ' - Copy';
+	}
 	tempo = composition.tempo;
 	document.getElementById('tempo-slider').value = (800 - tempo).toString();
 	playingClips = composition.playingClips;
