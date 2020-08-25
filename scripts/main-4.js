@@ -511,7 +511,7 @@ function reset() {
 	clearInterval(intervalId);
 	clearInterval(evolutionIntervalId);
 	toggleButton.innerHTML = 'GO';
-	playingClips.splice(0, playingClips.length);
+	playingClips = [];
 	const noteEls = document.getElementsByClassName('note');
 	for (const el of noteEls) {
 		el.classList.remove('selected');
