@@ -110,8 +110,22 @@ const clips = [
 
 const playingClips = [];
 const buffers = {};
+let selectedFileName, selectedMelodyBeatNum, melodyNoteCell;
 
 function onLoad() {
+
+	{
+		const noteSelectionDiv = document.getElementById('note-selection');
+		let html = '';
+		for (let col = 0; col < 2; col++) {
+			html += '<div class="col">';
+			for (let i = col * noteNames.length / 2; i < (col + 1) * noteNames.length / 2; i++) {
+				html += `<div onClick="melodyNoteSelected(event, ${i})">${noteNames[i]}</div>`;
+			}
+			html += '</div>';
+		}
+		noteSelectionDiv.innerHTML = html;
+	}
 	{
 		const evolveCheckbox = document.getElementById('evolve-checkbox');
 		const evolveSlider = document.getElementById('evolution-slider');
@@ -127,10 +141,10 @@ function onLoad() {
 		evolveCheckbox.onchange = () => {
 			clearInterval(evolutionIntervalId);
 			if (evolveCheckbox.checked) {
-				evolveSliderContainer.style = 'display: inline;';
+				evolveSliderContainer.classList.remove('hidden');
 				evolutionIntervalId = setInterval(evolve, 2000 - evolveSlider.value * 200);
 			} else {
-				evolveSliderContainer.style = 'display: none;';
+				evolveSliderContainer.classList.add('hidden');
 			}
 		};
 	}
@@ -306,13 +320,25 @@ function toggleMelodyNote(event, fileName, index) {
 			playingClips[index] = playingClips[index].filter(c => c.fileName != fileName);
 			el.innerHTML = '';
 		} else {
-			let html = `<select onChange="melodyNoteSelected(event, '${fileName}', ${index})">`;
-			html += `<option>-</option>`;
-			for (const note of noteNames) {
-				html += `<option>${note}</option>`;
-			}
-			html += '</select>';
-			el.innerHTML = html;
+			selectedFileName = fileName;
+			selectedMelodyBeatNum = index;
+			melodyNoteCell = el;
+			const noteSelectionDiv = document.getElementById('note-selection');
+			noteSelectionDiv.classList.remove('hidden');
+			const height = parseInt(document.defaultView.getComputedStyle(noteSelectionDiv).height);
+			const width = parseInt(document.defaultView.getComputedStyle(noteSelectionDiv).width);
+			const y = Math.min(event.y, innerHeight - height) - 24;
+			const x = Math.min(event.x + 18, innerWidth - width - 24);
+			noteSelectionDiv.style.top = `${y}px`;
+			noteSelectionDiv.style.left = `${x}px`;
+
+			// let html = `<select onChange="melodyNoteSelected(event, '${fileName}', ${index})">`;
+			// html += `<option>-</option>`;
+			// for (const note of noteNames) {
+			// 	html += `<option>${note}</option>`;
+			// }
+			// html += '</select>';
+			// el.innerHTML = html;
 
 			// no.
 			// el.childNodes[0].click();
@@ -328,12 +354,16 @@ function toggleMelodyNote(event, fileName, index) {
 }
 
 
-function melodyNoteSelected(event, fileName, index) {
+function melodyNoteSelected(event, pitchIndex) {
+	document.getElementById('note-selection').classList.add('hidden');
 	const el = event.target;
-	el.parentNode.innerHTML = el.selectedOptions[0].innerHTML;
-	playingClips[index].push({
-		fileName,
-		pitchIndex: el.selectedIndex - 1,
+	melodyNoteCell.innerHTML = el.innerHTML;
+	if (!playingClips[selectedMelodyBeatNum]) {
+		playingClips[selectedMelodyBeatNum] = [];
+	}
+	playingClips[selectedMelodyBeatNum].push({
+		fileName: selectedFileName,
+		pitchIndex,
 		type: 'melody',
 	});
 }

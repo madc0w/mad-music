@@ -63,7 +63,7 @@
 }
 
 #evolution-slider-container {
-	display: none;
+	display: inline;
 }
 
 #evolution-slider-container span {
@@ -74,6 +74,39 @@
 	width: 200px;
 }
 
+#note-selection {
+	position: absolute;
+	background-color: white;
+	border-radius: 12px;
+	border-style: solid;
+	border-color: #222;
+	border-width: 1px;
+	padding: 8px;
+	width: 80px;
+	text-align: center;
+	top: 100px;
+	left: calc(50% - 40px);
+	box-shadow: 10px 15px 24px 0px rgba(0, 0, 0, 0.4);
+}
+
+#note-selection .col {
+	display: inline-block;
+}
+
+#note-selection .col div {
+	cursor: pointer;
+	padding: 2px;
+}
+
+#note-selection .col div:hover {
+	font-weight: bold;
+	background-color: #eee;
+}
+
 button {
 	min-width: 80px;
+}
+
+.hidden {
+	display: none !important;
 }
