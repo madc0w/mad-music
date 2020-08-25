@@ -251,7 +251,7 @@ function onLoad() {
 
 	const tempoSlider = document.getElementById('tempo-slider');
 	tempoSlider.onchange = el => {
-		tempo = parseInt(el.target.value);
+		tempo = 800 - parseInt(el.target.value);
 		if (isPlaying) {
 			clearInterval(intervalId);
 			intervalId = setInterval(loop, tempo);
@@ -307,7 +307,7 @@ function loop() {
 			const source = audioCtx.createBufferSource();
 			source.connect(audioCtx.destination);
 			if (clip.type == 'melody') {
-				play(clip.fileName, 1000 * buffers[clip.fileName].duration, clip.pitchIndex);
+				play(clip);
 			} else {
 				source.buffer = buffers[clip.fileName];
 				source.start();
@@ -410,19 +410,11 @@ function mouseOutCell(el, fileName) {
 	cell.classList.remove('selected');
 }
 
-function testNote() {
-	const durationTime = 600;
-	for (let i in noteNames) {
-		setTimeout(() => {
-			play('jews-harp', durationTime, i);
-		}, i * durationTime);
-	}
-}
-
-function play(bufferName, durationTime, pitchIndex) {
+function play(clip) {
+	const durationTime = 1000 * buffers[clip.fileName].duration;
 	// console.log(noteNames[pitchIndex]);
-	const buffer = buffers[bufferName];
-	const pitchShift = Math.pow(2, (pitchIndex - noteNames.length / 2) / 12) * durationTime / (1000 * buffer.duration);
+	const buffer = buffers[clip.fileName];
+	const pitchShift = Math.pow(2, (clip.pitchIndex - noteNames.length / 2) / 12) * durationTime / (1000 * buffer.duration);
 	const playbackRate = 1000 * buffer.duration / durationTime;
 	const source = audioCtx.createBufferSource();
 	source.playbackRate.value = playbackRate;
@@ -482,7 +474,7 @@ function load(name) {
 	reset();
 	const composition = (localStorage.saved && JSON.parse(localStorage.saved)[name]) || sampleCompositions[name];
 	tempo = composition.tempo;
-	document.getElementById('tempo-slider').value = tempo.toString();
+	document.getElementById('tempo-slider').value = (800 - tempo).toString();
 	playingClips = composition.playingClips;
 	for (let beatNum in playingClips) {
 		if (playingClips[beatNum]) {

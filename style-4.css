@@ -60,9 +60,13 @@
 	margin-left: 18px;
 }
 
+#tempo-slider {
+	width: 80px;
+}
+
 #evolve-container {
 	font-weight: bold;
-	display: inline;
+	display: inline-block;
 	margin-left: 18px;
 }
 
@@ -72,10 +76,6 @@
 
 #evolution-slider-container span {
 	font-weight: normal;
-}
-
-#tempo-slider {
-	width: 200px;
 }
 
 .modal {
@@ -160,6 +160,11 @@
 #open-save-button {
 	vertical-align: middle;
 	margin-left: 8px;
+}
+
+#byline {
+	font-size: 12px;
+	margin-bottom: 6px;
 }
 
 button {
