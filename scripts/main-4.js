@@ -461,7 +461,7 @@ function addRandomNote() {
 		}
 		playingClips[beatNum].push({
 			fileName: clip.fileName,
-			pitchIndex: el.selectedIndex - 1,
+			pitchIndex: Math.floor(Math.random() * noteNames.length),
 			type: 'melody',
 		});
 	}
