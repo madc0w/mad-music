@@ -110,7 +110,7 @@ const clips = [
 
 const buffers = {};
 let playingClips = [];
-let selectedFileName, selectedMelodyBeatNum, melodyNoteCell, toggleButton;
+let selectedFileName, selectedMelodyBeatNum, melodyNoteCell, toggleButton, evolveSlider;
 
 function onLoad() {
 	{
@@ -190,12 +190,8 @@ function onLoad() {
 	}
 	{
 		const evolveCheckbox = document.getElementById('evolve-checkbox');
-		const evolveSlider = document.getElementById('evolution-slider');
+		evolveSlider = document.getElementById('evolution-slider');
 		const evolveSliderContainer = document.getElementById('evolution-slider-container');
-		function evolve() {
-			addRandomNote();
-			removeRandomNote();
-		};
 		evolveSlider.onchange = () => {
 			clearInterval(evolutionIntervalId);
 			evolutionIntervalId = setInterval(evolve, 8000 - evolveSlider.value * tempo);
@@ -347,6 +343,7 @@ function loop() {
 
 function toggleNote(el, fileName, index) {
 	el.classList.toggle('selected');
+	animate(el);
 	if (!playingClips[index]) {
 		playingClips[index] = [];
 	}
@@ -370,6 +367,7 @@ function toggleMelodyNote(event, fileName, index) {
 		}
 		if (isSelected) {
 			el.classList.remove('selected');
+			animate(el);
 			playingClips[index] = playingClips[index].filter(c => c.fileName != fileName);
 			el.innerHTML = '';
 		} else {
@@ -398,6 +396,7 @@ function melodyNoteSelected(event, pitchIndex) {
 	melodyNoteCell.innerHTML = el.innerHTML;
 	melodyNoteCell.classList.remove('selecting');
 	melodyNoteCell.classList.add('selected');
+	animate(melodyNoteCell);
 	if (!playingClips[selectedMelodyBeatNum]) {
 		playingClips[selectedMelodyBeatNum] = [];
 	}
@@ -446,13 +445,20 @@ function play(clip) {
 }
 
 function addRandomNote() {
-	const beatNum = Math.floor(Math.random() * beatsPerMesaure);
-	const clip = clips[Math.floor(Math.random() * clips.length)];
+	let beatNum, clip, i = 0;
+	do {
+		beatNum = Math.floor(Math.random() * beatsPerMesaure);
+		clip = clips[Math.floor(Math.random() * clips.length)];
+	} while (playingClips[beatNum] && playingClips[beatNum].find(c => c.fileName == clip.fileName) && i++ < 80);
+	if (i > 80) {
+		return false;
+	}
 	const el = document.getElementById(`note-${clip.fileName}-${beatNum}`);
 	if (clip.type == 'rhythm') {
 		el.click();
 	} else {
 		el.classList.add('selected');
+		animate(el);
 		const pitchIndex = Math.floor(Math.random() * noteNames.length);
 		const note = noteNames[pitchIndex];
 		el.innerHTML = note;
@@ -460,11 +466,13 @@ function addRandomNote() {
 			playingClips[beatNum] = [];
 		}
 		playingClips[beatNum].push({
+			id: Math.floor(Math.random() * 1e12),
 			fileName: clip.fileName,
 			pitchIndex: Math.floor(Math.random() * noteNames.length),
 			type: 'melody',
 		});
 	}
+	return true;
 }
 
 function removeRandomNote() {
@@ -483,6 +491,7 @@ function removeRandomNote() {
 		const el = document.getElementById(`note-${removingClip.fileName}-${toRemove.i}`);
 		el.innerHTML = '';
 		el.classList.remove('selected');
+		animate(el);
 		playingClips[toRemove.i] = playingClips[toRemove.i].filter(c => c.fileName != toRemove.fileName);
 	}
 }
@@ -532,3 +541,22 @@ function reset() {
 	}
 	mesaureNum = 0;
 }
+
+function animate(el) {
+	const maxIts = 16;
+	let it = 0;
+	el.style.backgroundColor = 'white';
+	const animateIntervalId = setInterval(() => {
+		if (++it > maxIts) {
+			clearInterval(animateIntervalId);
+			el.style = '';
+		} else {
+			el.style.opacity = (maxIts - it) / maxIts;
+		}
+	}, 20);
+}
+
+function evolve() {
+	addRandomNote();
+	removeRandomNote();
+};
