@@ -30,6 +30,17 @@
 			<table id="compositions-list"></table>
 		</div>
 
+		<div id="share-modal" class="hidden modal">
+			<div class="modal-header">Share Composition </div>
+			<div>
+				<div>
+					This link will open your composition. It has been copied to your clipboard.<br />
+					Just paste this link anywhere to share your composition with someone you love!
+				</div>
+				<input type="text" id="share-url" />
+			</div>
+		</div>
+
 		<div class="main">
 			<div id="byline">
 				Brought to you by <a href="https://www.gglabs.com/~mad">Marc A. Donis</a>. Thanks to <a target="freesound" href="https://freesound.org/">Freesound</a> for the
@@ -46,6 +57,10 @@
 				<div id="open-save-button" class="control-button">
 					<img src="icons/save-24px.svg" alt="Save music" />
 					<div>Save</div>
+				</div>
+				<div id="open-share-button" class="control-button">
+					<img src="icons/share-24px.svg" alt="Share" />
+					<div>Share</div>
 				</div>
 				<div id="tempo-slider-container">
 					<label for="tempo-slider">Tempo</label>

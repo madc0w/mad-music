@@ -112,6 +112,18 @@
 	margin-bottom: 12px;
 }
 
+#share-modal {
+	left: calc(50% - 140px);
+	width: 280px;
+	line-height: 24px;
+}
+
+#share-modal input {
+	margin-top: 12px;
+	margin-bottom: 12px;
+	width: 90%;
+}
+
 #save-modal {
 	left: calc(50% - 140px);
 	width: 280px;

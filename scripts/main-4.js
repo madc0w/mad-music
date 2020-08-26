@@ -116,11 +116,7 @@ function onLoad() {
 	{
 		document.getElementById('save-button').onclick = event => {
 			const saved = localStorage.saved ? JSON.parse(localStorage.saved) : {};
-			saved[document.getElementById('save-name').value] = {
-				date: new Date().getTime(),
-				playingClips,
-				tempo,
-			};
+			saved[document.getElementById('save-name').value] = compositionData();
 			localStorage.saved = JSON.stringify(saved);
 			closeAll();
 		};
@@ -128,6 +124,7 @@ function onLoad() {
 
 	const saveModal = document.getElementById('save-modal');
 	const loadModal = document.getElementById('load-modal');
+	const shareModal = document.getElementById('share-modal');
 	document.getElementById('open-load-button').onclick = event => {
 		setTimeout(() => {
 			const table = document.getElementById('compositions-list');
@@ -156,12 +153,30 @@ function onLoad() {
 			document.getElementById('save-name').focus();
 		}, 20);
 	};
+	document.getElementById('open-share-button').onclick = event => {
+		setTimeout(() => {
+			shareModal.classList.remove('hidden');
+			const shareUrlInput = document.getElementById('share-url');
+			let url = location.href;
+			if (url.indexOf('?') > 0) {
+				url = url.substring(0, url.indexOf('?'));
+			}
+			const data = compositionData();
+			url += '?composition=' + encodeURI(JSON.stringify(data));
+			shareUrlInput.value = url;
+			shareUrlInput.select();
+			shareUrlInput.setSelectionRange(0, 1e6); // For mobile devices
+			document.execCommand('copy');
+
+		}, 20);
+	};
 
 	const noteSelectionDiv = document.getElementById('note-selection');
 	function closeAll() {
 		noteSelectionDiv.classList.add('hidden');
 		saveModal.classList.add('hidden');
 		loadModal.classList.add('hidden');
+		shareModal.classList.add('hidden');
 		if (melodyNoteCell) {
 			melodyNoteCell.classList.remove('selecting');
 		}
@@ -294,6 +309,11 @@ function onLoad() {
 			});
 		}
 		request.send();
+	}
+
+	if (location.search && location.search.startsWith('?composition=')) {
+		const composition = JSON.parse(decodeURI(location.search.substring('?composition='.length)));
+		setComposition(composition);
 	}
 
 }
@@ -506,6 +526,10 @@ function load(name) {
 		composition = sampleCompositions[name];
 		saveNameInput.value = name + ' - Copy';
 	}
+	setComposition(composition);
+}
+
+function setComposition(composition) {
 	tempo = composition.tempo;
 	document.getElementById('tempo-slider').value = (800 - tempo).toString();
 	playingClips = composition.playingClips;
@@ -560,3 +584,11 @@ function evolve() {
 	addRandomNote();
 	removeRandomNote();
 };
+
+function compositionData() {
+	return {
+		date: new Date().getTime(),
+		playingClips,
+		tempo,
+	};
+}
