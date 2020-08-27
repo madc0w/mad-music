@@ -4,153 +4,6 @@ const numRandomNotes = 24;
 let mesaureNum = 0;
 let intervalId, evolutionIntervalId;
 let isPlaying = false;
-const clips = [
-	// rhythm
-	{
-		fileName: 'bass-drum-1',
-		displayName: 'Bass Drum 1',
-		type: 'rhythm',
-	}, {
-		fileName: 'bass-drum-2',
-		displayName: 'Bass Drum 2',
-		type: 'rhythm',
-	}, {
-		fileName: 'snare-1',
-		displayName: 'Snare',
-		type: 'rhythm',
-	}, {
-		fileName: 'hi-hat-1',
-		displayName: 'Hi-hat Closed',
-		type: 'rhythm',
-	}, {
-		fileName: 'hi-hat-2',
-		displayName: 'Hi-hat Open',
-		type: 'rhythm',
-	}, {
-		fileName: 'cymbal-1',
-		displayName: 'Cymbal 1',
-		type: 'rhythm',
-	}, {
-		fileName: 'cymbal-2',
-		displayName: 'Cymbal 2',
-		type: 'rhythm',
-	}, {
-		fileName: 'cymbal-3',
-		displayName: 'Cymbal 3',
-		type: 'rhythm',
-	}, {
-		fileName: 'gunshot',
-		displayName: 'Gunshot',
-		type: 'rhythm',
-	}, {
-		fileName: 'pipe',
-		displayName: 'Pipe',
-		type: 'rhythm',
-	}, {
-		fileName: 'boom',
-		displayName: 'Boom',
-		type: 'rhythm',
-	}, {
-		fileName: 'boom-rattle',
-		displayName: 'Boom Rattle',
-		type: 'rhythm',
-	}, {
-		fileName: 'ding',
-		displayName: 'Ding',
-		type: 'rhythm',
-	}, {
-		fileName: 'clap-1',
-		displayName: 'Clap 1',
-		type: 'rhythm',
-	}, {
-		fileName: 'clap-2',
-		displayName: 'Clap 2',
-		type: 'rhythm',
-	}, {
-		fileName: 'gong-3',
-		displayName: 'Gong 1',
-		type: 'rhythm',
-	}, {
-		fileName: 'gong-4',
-		displayName: 'Gong 2',
-		type: 'rhythm',
-	}, {
-		fileName: 'gong-5',
-		displayName: 'Gong 3',
-		type: 'rhythm',
-	},
-
-	// melody
-	{
-		fileName: 'piano-note-high',
-		displayName: 'Piano High',
-		type: 'melody',
-	}, {
-		fileName: 'piano-note-low',
-		displayName: 'Piano Low',
-		type: 'melody',
-	}, {
-		fileName: 'jews-harp',
-		displayName: 'Jew\'s Harp 1',
-		type: 'melody',
-	}, {
-		fileName: 'jews-harp-2',
-		displayName: 'Jew\'s Harp 2',
-		type: 'melody',
-	}, {
-		fileName: 'violin-note',
-		displayName: 'Violin 1',
-		type: 'melody',
-	}, {
-		fileName: 'violin-note-2',
-		displayName: 'Violin 2',
-		type: 'melody',
-	}, {
-		fileName: 'violin-note-long',
-		displayName: 'Violin 3',
-		type: 'melody',
-	}, {
-		fileName: 'wobbly-note',
-		displayName: 'Wobbly',
-		type: 'melody',
-	}, {
-		fileName: 'slap-bass-1',
-		displayName: 'Slap Bass 1',
-		type: 'melody',
-	}, {
-		fileName: 'slap-bass-2',
-		displayName: 'Slap Bass 2',
-		type: 'melody',
-	}, {
-		fileName: 'slap-bass-3',
-		displayName: 'Slap Bass 3',
-		type: 'melody',
-	}, {
-		fileName: 'short-string',
-		displayName: 'String',
-		type: 'melody',
-	}, {
-		fileName: 'echo-guitar',
-		displayName: 'Echo Guitar',
-		type: 'melody',
-	}, {
-		fileName: 'swoosh',
-		displayName: 'Swoosh',
-		type: 'melody',
-	}, {
-		fileName: 'opera-female-1',
-		displayName: 'Opera Female 1',
-		type: 'melody',
-	}, {
-		fileName: 'opera-female-2',
-		displayName: 'Opera Female 2',
-		type: 'melody',
-	}, {
-		fileName: 'opera-tenor-1',
-		displayName: 'Opera Tenor',
-		type: 'melody',
-	}
-];
 
 const buffers = {};
 let playingClips = [];
@@ -225,6 +78,7 @@ function onLoad() {
 			melodyNoteCell.classList.remove('selecting');
 		}
 	}
+
 	document.onkeyup = event => {
 		if (event.key == 'Escape') {
 			closeAll();
@@ -276,35 +130,22 @@ function onLoad() {
 			html += `<td class="beat-number" id="beat-${i}">${i + 1}</td>`;
 		}
 		html += '</tr>';
-		for (const clip of clips.filter(c => c.type == 'rhythm')) {
-			html += `<tr id="clip-row-${clip.fileName}">`;
-			html += `<td class="clip-name" id="clip-name-${clip.fileName}">`;
-			html += `<img src="icons/close-24px.svg" onClick="removeClip('${clip.fileName}', 'rhythm')"/>`;
-			html += clip.displayName;
-			html += '</td>';
-			for (let i = 0; i < beatsPerMesaure; i++) {
-				html += `<td class="note beat-${i}" id="note-${clip.fileName}-${i}" onClick="toggleNote(this, '${clip.fileName}', ${i})" onMouseOut="mouseOutCell(this, '${clip.fileName}')" onMouseOver="mouseOverCell(this, '${clip.fileName}')"/>`;
-			}
-			html += '</tr>';
+		for (const clip of clips.filter(c => c.type == 'rhythm' && c.isDefault)) {
+			html += clipRow(clip.fileName);
 		}
 		rhythmMeasures.innerHTML = html;
+		setAddClipRow('rhythm');
 	}
 	{
 		const melodyMeasures = document.getElementById('melody-measures-table');
 		let html = '';
 		html += '<caption>And melody!</caption>';
-		for (const clip of clips.filter(c => c.type == 'melody')) {
-			html += `<tr id="clip-row-${clip.fileName}">`;
-			html += `<td class="clip-name" id="clip-name-${clip.fileName}">`;
-			html += `<img src="icons/close-24px.svg" onClick="removeClip('${clip.fileName}', 'rhythm')"/>`;
-			html += clip.displayName;
-			html += '</td>';
-			for (let i = 0; i < beatsPerMesaure; i++) {
-				html += `<td class="note beat-${i}" id="note-${clip.fileName}-${i}" onClick="toggleMelodyNote(event, '${clip.fileName}', ${i})" onMouseOut="mouseOutCell(this, '${clip.fileName}')" onMouseOver="mouseOverCell(this, '${clip.fileName}')"/>`;
-			}
-			html += '</tr>';
+		for (const clip of clips.filter(c => c.type == 'melody' && c.isDefault)) {
+			html += clipRow(clip.fileName);
 		}
+		html += `<tr id="add-clip-row-melody"></tr>`;
 		melodyMeasures.innerHTML = html;
+		setAddClipRow('melody');
 	}
 
 	const tempoSlider = document.getElementById('tempo-slider');
@@ -330,8 +171,6 @@ function onLoad() {
 
 	toggleButton = document.getElementById('toggle-button');
 	toggleButton.onclick = () => {
-		// testNote();
-
 		isPlaying = !isPlaying;
 		toggleButton.innerHTML = isPlaying ? 'STOP' : 'GO';
 		if (isPlaying) {
@@ -582,7 +421,29 @@ function setComposition(composition) {
 	for (let beatNum in playingClips) {
 		if (playingClips[beatNum]) {
 			for (let note of playingClips[beatNum]) {
+				let row = document.getElementById(`clip-row-${note.fileName}`);
+				if (!row) {
+					const tableEl = document.getElementById(`${note.type}-measures-table`);
+					row = tableEl.insertRow(note.type == 'rhythm' ? 1 : 0);
+					row.id = `clip-row-${note.fileName}`;
+					{
+						const cell = row.insertCell(0);
+						cell.id = `clip-name-${note.fileName}`;
+						cell.classList.add('clip-name');
+						const displayName = clips.find(c => c.fileName == note.fileName).displayName;
+						cell.innerHTML = `<img src="icons/close-24px.svg" onClick="removeClip('${note.fileName}')"/>${displayName}`;
+					}
+					for (let i = 0; i < beatsPerMesaure; i++) {
+						const cell = row.insertCell(1);
+						cell.id = `note-${note.fileName}-${beatsPerMesaure - i - 1}`;
+						cell.classList.add('note');
+						cell.classList.add(`beat-${beatsPerMesaure - i - 1}`);
+					}
+				}
 				const cell = document.getElementById(`note-${note.fileName}-${beatNum}`);
+				if (!cell) {
+					console.log(`note-${note.fileName}-${beatNum}`);
+				}
 				cell.classList.add('selected');
 				if (note.type == 'melody') {
 					cell.innerHTML = noteNames[note.pitchIndex];
@@ -613,7 +474,7 @@ function reset() {
 }
 
 function animate(el) {
-	const maxIts = 16;
+	const maxIts = 24;
 	let it = 0;
 	el.style.backgroundColor = 'white';
 	const animateIntervalId = setInterval(() => {
@@ -639,10 +500,58 @@ function compositionData() {
 	};
 }
 
-function removeClip(fileName, type) {
+function removeClip(fileName) {
+	const type = clips.find(c => c.fileName == fileName).type;
 	const rowEl = document.getElementById(`clip-row-${fileName}`);
 	rowEl.remove();
 	for (const beatNum in playingClips) {
 		playingClips[beatNum] = playingClips[beatNum].filter(c => c.fileName != fileName);
 	}
+	setAddClipRow(type);
+}
+
+function setAddClipRow(type) {
+	let html = '';
+	html += `<select onChange="addClip(this, '${type}')">`;
+	html += '<option>Add a clip</option>';
+	let count = 0;
+	for (const clip of clips.filter(c => c.type == type)) {
+		if (!document.getElementById(`clip-name-${clip.fileName}`)) {
+			html += `<option filename="${clip.fileName}">${clip.displayName}</option>`;
+			count++;
+		}
+	}
+	html += '</select>';
+	if (count == 0) {
+		html = 'No more clips to add!';
+	}
+	document.getElementById(`add-clip-container-${type}`).innerHTML = html;
+}
+
+
+function addClip(selectEl, type) {
+	const optionEl = selectEl.selectedOptions[0];
+	const fileName = optionEl.getAttribute('filename');
+	if (fileName) {
+		optionEl.remove();
+		const tabelEl = document.getElementById(`${type}-measures-table`);
+		tabelEl.innerHTML += clipRow(fileName);
+		setAddClipRow(type);
+	}
+}
+
+function clipRow(fileName) {
+	const displayName = clips.find(c => c.fileName == fileName).displayName;
+	let html = `<tr id="clip-row-${fileName}">`;
+	html += `<td class="clip-name" id="clip-name-${fileName}">`;
+	html += `<img src="icons/close-24px.svg" onClick="removeClip('${fileName}')"/>`;
+	html += displayName;
+	html += '</td>';
+	const type = clips.find(c => c.fileName == fileName).type;
+	for (let i = 0; i < beatsPerMesaure; i++) {
+		const onClick = type == 'rhythm' ? `toggleNote(this, '${fileName}', ${i})` : `toggleMelodyNote(event, '${fileName}', ${i})`;
+		html += `<td class="note beat-${i}" id="note-${fileName}-${i}" onClick="${onClick}" onMouseOut="mouseOutCell(this, '${fileName}')" onMouseOver="mouseOverCell(this, '${fileName}')"/>`;
+	}
+	html += '</tr>';
+	return html;
 }
