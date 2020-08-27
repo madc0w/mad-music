@@ -27,8 +27,15 @@
 	background-color: #ddd;
 	min-width: 100px;
 	padding: 4px;
-	text-align: center;
+	text-align: left;
 	font-weight: bold;
+	white-space: nowrap;
+}
+
+#mesure-tables table .clip-name img {
+	width: 18px;
+	margin-right: 8px;
+	cursor: pointer;
 }
 
 #mesure-tables table .clip-name.selected {

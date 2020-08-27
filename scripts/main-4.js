@@ -8,7 +8,11 @@ const clips = [
 	// rhythm
 	{
 		fileName: 'bass-drum-1',
-		displayName: 'Bass Drum',
+		displayName: 'Bass Drum 1',
+		type: 'rhythm',
+	}, {
+		fileName: 'bass-drum-2',
+		displayName: 'Bass Drum 2',
 		type: 'rhythm',
 	}, {
 		fileName: 'snare-1',
@@ -21,6 +25,18 @@ const clips = [
 	}, {
 		fileName: 'hi-hat-2',
 		displayName: 'Hi-hat Open',
+		type: 'rhythm',
+	}, {
+		fileName: 'cymbal-1',
+		displayName: 'Cymbal 1',
+		type: 'rhythm',
+	}, {
+		fileName: 'cymbal-2',
+		displayName: 'Cymbal 2',
+		type: 'rhythm',
+	}, {
+		fileName: 'cymbal-3',
+		displayName: 'Cymbal 3',
 		type: 'rhythm',
 	}, {
 		fileName: 'gunshot',
@@ -83,11 +99,31 @@ const clips = [
 		type: 'melody',
 	}, {
 		fileName: 'violin-note',
-		displayName: 'Violin',
+		displayName: 'Violin 1',
+		type: 'melody',
+	}, {
+		fileName: 'violin-note-2',
+		displayName: 'Violin 2',
+		type: 'melody',
+	}, {
+		fileName: 'violin-note-long',
+		displayName: 'Violin 3',
 		type: 'melody',
 	}, {
 		fileName: 'wobbly-note',
 		displayName: 'Wobbly',
+		type: 'melody',
+	}, {
+		fileName: 'slap-bass-1',
+		displayName: 'Slap Bass 1',
+		type: 'melody',
+	}, {
+		fileName: 'slap-bass-2',
+		displayName: 'Slap Bass 2',
+		type: 'melody',
+	}, {
+		fileName: 'slap-bass-3',
+		displayName: 'Slap Bass 3',
 		type: 'melody',
 	}, {
 		fileName: 'short-string',
@@ -102,8 +138,16 @@ const clips = [
 		displayName: 'Swoosh',
 		type: 'melody',
 	}, {
-		fileName: 'verbal-1',
-		displayName: 'Verbal',
+		fileName: 'opera-female-1',
+		displayName: 'Opera Female 1',
+		type: 'melody',
+	}, {
+		fileName: 'opera-female-2',
+		displayName: 'Opera Female 2',
+		type: 'melody',
+	}, {
+		fileName: 'opera-tenor-1',
+		displayName: 'Opera Tenor',
 		type: 'melody',
 	}
 ];
@@ -233,8 +277,9 @@ function onLoad() {
 		}
 		html += '</tr>';
 		for (const clip of clips.filter(c => c.type == 'rhythm')) {
-			html += '<tr>';
+			html += `<tr id="clip-row-${clip.fileName}">`;
 			html += `<td class="clip-name" id="clip-name-${clip.fileName}">`;
+			html += `<img src="icons/close-24px.svg" onClick="removeClip('${clip.fileName}', 'rhythm')"/>`;
 			html += clip.displayName;
 			html += '</td>';
 			for (let i = 0; i < beatsPerMesaure; i++) {
@@ -249,8 +294,9 @@ function onLoad() {
 		let html = '';
 		html += '<caption>And melody!</caption>';
 		for (const clip of clips.filter(c => c.type == 'melody')) {
-			html += '<tr>';
+			html += `<tr id="clip-row-${clip.fileName}">`;
 			html += `<td class="clip-name" id="clip-name-${clip.fileName}">`;
+			html += `<img src="icons/close-24px.svg" onClick="removeClip('${clip.fileName}', 'rhythm')"/>`;
 			html += clip.displayName;
 			html += '</td>';
 			for (let i = 0; i < beatsPerMesaure; i++) {
@@ -591,4 +637,12 @@ function compositionData() {
 		playingClips,
 		tempo,
 	};
+}
+
+function removeClip(fileName, type) {
+	const rowEl = document.getElementById(`clip-row-${fileName}`);
+	rowEl.remove();
+	for (const beatNum in playingClips) {
+		playingClips[beatNum] = playingClips[beatNum].filter(c => c.fileName != fileName);
+	}
 }
