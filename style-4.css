@@ -89,6 +89,19 @@
 	font-weight: normal;
 }
 
+.add-clip-container {
+	margin-top: 4px;
+}
+
+.add-clip-container select {
+	min-width: 160px;
+	font-size: 18px;
+	border-width: 4px;
+	border-style: solid;
+	border-color: #8e8;
+	border-radius: 8px;
+}
+
 .control-button {
 	display: inline-block;
 	font-size: 12px;
