@@ -92,7 +92,7 @@ function onLoad() {
 
 	{
 		let html = '';
-		const numCols = 4;
+		const numCols = 2;
 		for (let col = 0; col < numCols; col++) {
 			html += '<div class="col">';
 			for (let i = col * noteNames.length / numCols; i < (col + 1) * noteNames.length / numCols; i++) {
@@ -108,14 +108,14 @@ function onLoad() {
 		const evolveSliderContainer = document.getElementById('evolution-slider-container');
 		evolveSlider.onchange = () => {
 			clearInterval(evolutionIntervalId);
-			evolutionIntervalId = setInterval(evolve, 8000 - evolveSlider.value * tempo);
+			evolutionIntervalId = setInterval(evolve, 8000 - evolveSlider.value * 600);
 		};
 		evolveCheckbox.onchange = () => {
 			clearInterval(evolutionIntervalId);
 			evolutionIntervalId = null;
 			if (evolveCheckbox.checked) {
 				evolveSliderContainer.classList.remove('hidden');
-				evolutionIntervalId = setInterval(evolve, 8000 - evolveSlider.value * tempo);
+				evolutionIntervalId = setInterval(evolve, 8000 - evolveSlider.value * 600);
 			} else {
 				evolveSliderContainer.classList.add('hidden');
 			}
@@ -364,15 +364,15 @@ function playMelody(clip) {
 }
 
 function addRandomNote() {
-	let beatNum, clip, i = 0;
+	let el, beatNum, clip, i = 0;
 	do {
 		beatNum = Math.floor(Math.random() * beatsPerMesaure);
 		clip = clips[Math.floor(Math.random() * clips.length)];
-	} while (playingClips[beatNum] && playingClips[beatNum].find(c => c.fileName == clip.fileName) && i++ < 80);
+		el = document.getElementById(`note-${clip.fileName}-${beatNum}`);
+	} while ((!el || (playingClips[beatNum] && playingClips[beatNum].find(c => c.fileName == clip.fileName))) && i++ < 80);
 	if (i > 80) {
 		return false;
 	}
-	const el = document.getElementById(`note-${clip.fileName}-${beatNum}`);
 	if (clip.type == 'rhythm') {
 		el.click();
 	} else {
@@ -380,7 +380,15 @@ function addRandomNote() {
 		animate(el);
 		const pitchIndex = Math.floor(Math.random() * noteNames.length);
 		const note = noteNames[pitchIndex];
-		el.innerHTML = note;
+		const durationSlider = document.getElementById('duration-slider');
+
+		let html = '';
+		const durationVal = Math.floor(Math.random() * (1 + parseInt(durationSlider.max)));
+		const durationWidth = 100 * (1 + durationVal) / (1 + parseInt(durationSlider.max));
+		const duration = Math.pow(2, durationVal - 4);
+		html += `<div class="note-duration" style="width: ${durationWidth}%;"></div>`;
+		html += `<div>${note}</div>`;
+		el.innerHTML = html;
 		if (!playingClips[beatNum]) {
 			playingClips[beatNum] = [];
 		}
@@ -389,6 +397,7 @@ function addRandomNote() {
 			fileName: clip.fileName,
 			pitchIndex: Math.floor(Math.random() * noteNames.length),
 			type: 'melody',
+			duration,
 		});
 	}
 	return true;
@@ -432,6 +441,7 @@ function setComposition(composition) {
 	tempo = composition.tempo;
 	document.getElementById('tempo-slider').value = (800 - tempo).toString();
 	playingClips = composition.playingClips;
+	const durationSlider = document.getElementById('duration-slider');
 	for (let beatNum in playingClips) {
 		if (playingClips[beatNum]) {
 			for (let note of playingClips[beatNum]) {
@@ -455,12 +465,13 @@ function setComposition(composition) {
 					}
 				}
 				const cell = document.getElementById(`note-${note.fileName}-${beatNum}`);
-				if (!cell) {
-					console.log(`note-${note.fileName}-${beatNum}`);
-				}
 				cell.classList.add('selected');
 				if (note.type == 'melody') {
-					cell.innerHTML = noteNames[note.pitchIndex];
+					let html = '';
+					const durationWidth = 100 * (1 + Math.log2(note.duration || 1) + 4) / (1 + parseInt(durationSlider.max));
+					html += `<div class="note-duration" style="width: ${durationWidth}%;"></div>`;
+					html += `<div>${noteNames[note.pitchIndex]}</div>`;
+					cell.innerHTML = html;
 				}
 			}
 		}
