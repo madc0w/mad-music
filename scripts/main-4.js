@@ -130,6 +130,7 @@ function onLoad() {
 		for (let i = 0; i < beatsPerMesaure; i++) {
 			html += `<td class="beat-number" id="beat-${i}">${i + 1}</td>`;
 		}
+		html += '<td id="add-remove-beat"><img src="icons/add_circle-24px.svg" onClick="addBeat()"/><img src="icons/remove_circle-24px.svg" onClick="removeBeat()"/></td>';
 		html += '</tr>';
 		for (const clip of clips.filter(c => c.type == 'rhythm' && c.isDefault)) {
 			html += clipRow(clip.fileName);
@@ -144,7 +145,6 @@ function onLoad() {
 		for (const clip of clips.filter(c => c.type == 'melody' && c.isDefault)) {
 			html += clipRow(clip.fileName);
 		}
-		html += `<tr id="add-clip-row-melody"></tr>`;
 		melodyMeasures.innerHTML = html;
 		setAddClipRow('melody');
 	}
@@ -572,13 +572,18 @@ function clipRow(fileName) {
 	html += `<img src="icons/close-24px.svg" onClick="removeClip('${fileName}')"/>`;
 	html += displayName;
 	html += '</td>';
-	const type = clips.find(c => c.fileName == fileName).type;
 	for (let i = 0; i < beatsPerMesaure; i++) {
-		const onClick = type == 'rhythm' ? `toggleNote(this, '${fileName}', ${i})` : `toggleMelodyNote(event, '${fileName}', ${i})`;
-		html += `<td class="note beat-${i}" id="note-${fileName}-${i}" onClick="${onClick}" onMouseOut="mouseOutCell(this, '${fileName}')" onMouseOver="mouseOverCell(this, '${fileName}')"/>`;
+		html += clipCell(fileName, i);
 	}
+	html += '<td></td>';
 	html += '</tr>';
 	return html;
+}
+
+function clipCell(fileName, i) {
+	const type = clips.find(c => c.fileName == fileName).type;
+	const onClick = type == 'rhythm' ? `toggleNote(this, '${fileName}', ${i})` : `toggleMelodyNote(event, '${fileName}', ${i})`;
+	return `<td class="note beat-${i}" id="note-${fileName}-${i}" onClick="${onClick}" onMouseOut="mouseOutCell(this, '${fileName}')" onMouseOver="mouseOverCell(this, '${fileName}')"/>`;
 }
 
 function durationChnage() {
@@ -589,4 +594,63 @@ function durationChnage() {
 		durationStr = `1/${Math.pow(2, -e)}`;
 	}
 	document.getElementById('note-duration').innerHTML = `${durationStr} &times;`;
+}
+
+function addBeat() {
+	beatsPerMesaure++;
+	const beatNum = beatsPerMesaure - 1;
+	{
+		const table = document.getElementById('rhythm-measures-table');
+		const headerRow = table.rows[0];
+		const headerCell = headerRow.insertCell(headerRow.cells.length - 1);
+		headerCell.innerHTML = beatsPerMesaure;
+		headerCell.id = `beat-${beatNum}`;
+		headerCell.classList.add('beat-number');
+		for (let i = 1; i < table.rows.length; i++) {
+			const row = table.rows[i];
+			const cellId = row.cells[0].id;
+			const fileName = cellId.substring('clip-name-'.length);
+			const cell = row.insertCell(row.cells.length - 1);
+			cell.classList.add('note');
+			cell.classList.add(`beat-${beatNum}`);
+			cell.id = `note-${fileName}-${beatNum}`;
+			cell.onclick = () => {
+				toggleNote(cell, fileName, beatNum);
+			};
+			cell.onmouseover = () => {
+				mouseOverCell(cell, fileName);
+			};
+			cell.onmouseout = () => {
+				mouseOutCell(cell, fileName);
+			};
+		}
+	}
+	{
+		const table = document.getElementById('melody-measures-table');
+		for (let i = 0; i < table.rows.length; i++) {
+			const row = table.rows[i];
+			const cellId = row.cells[0].id;
+			const fileName = cellId.substring('clip-name-'.length);
+			const cell = row.insertCell(row.cells.length - 1);
+			cell.classList.add('note');
+			cell.classList.add(`beat-${beatNum}`);
+			cell.id = `note-${fileName}-${beatNum}`;
+			cell.onclick = event => {
+				toggleMelodyNote(event, fileName, beatNum);
+			};
+			cell.onmouseover = () => {
+				mouseOverCell(cell, fileName);
+			};
+			cell.onmouseout = () => {
+				mouseOutCell(cell, fileName);
+			};
+		}
+	}
+}
+
+function removeBeat() {
+	if (beatsPerMesaure > 2) {
+		beatsPerMesaure--;
+
+	}
 }
