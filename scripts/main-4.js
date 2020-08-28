@@ -92,14 +92,15 @@ function onLoad() {
 
 	{
 		let html = '';
-		for (let col = 0; col < 2; col++) {
+		const numCols = 4;
+		for (let col = 0; col < numCols; col++) {
 			html += '<div class="col">';
-			for (let i = col * noteNames.length / 2; i < (col + 1) * noteNames.length / 2; i++) {
+			for (let i = col * noteNames.length / numCols; i < (col + 1) * noteNames.length / numCols; i++) {
 				html += `<div onClick="melodyNoteSelected(event, ${i})">${noteNames[i]}</div>`;
 			}
 			html += '</div>';
 		}
-		noteSelectionDiv.innerHTML = html;
+		document.getElementById('note-names').innerHTML = html;
 	}
 	{
 		const evolveCheckbox = document.getElementById('evolve-checkbox');
@@ -215,7 +216,7 @@ function loop() {
 			const source = audioCtx.createBufferSource();
 			source.connect(audioCtx.destination);
 			if (clip.type == 'melody') {
-				play(clip);
+				playMelody(clip);
 			} else {
 				source.buffer = buffers[clip.fileName];
 				source.start();
@@ -264,33 +265,36 @@ function toggleNote(el, fileName, index) {
 }
 
 function toggleMelodyNote(event, fileName, index) {
-	const el = event.target;
-	if (el.tagName == 'TD') {
-		const isSelected = el.classList.contains('selected');
-		if (!playingClips[index]) {
-			playingClips[index] = [];
-		}
-		if (isSelected) {
-			el.classList.remove('selected');
-			animate(el);
-			playingClips[index] = playingClips[index].filter(c => c.fileName != fileName);
-			el.innerHTML = '';
-		} else {
-			setTimeout(() => {
-				el.classList.add('selecting');
-				selectedFileName = fileName;
-				selectedMelodyBeatNum = index;
-				melodyNoteCell = el;
-				const noteSelectionDiv = document.getElementById('note-selection');
-				noteSelectionDiv.classList.remove('hidden');
-				const height = parseInt(document.defaultView.getComputedStyle(noteSelectionDiv).height);
-				const width = parseInt(document.defaultView.getComputedStyle(noteSelectionDiv).width);
-				const y = Math.min(event.y, innerHeight - height) - 24;
-				const x = Math.min(event.x + 18, innerWidth - width - 24);
-				noteSelectionDiv.style.top = `${y}px`;
-				noteSelectionDiv.style.left = `${x}px`;
-			}, 20);
-		}
+	let el = event.target;
+	while (el.tagName != 'TD') {
+		el = el.parentNode;
+	}
+	const isSelected = el.classList.contains('selected');
+	if (!playingClips[index]) {
+		playingClips[index] = [];
+	}
+	if (isSelected) {
+		el.classList.remove('selected');
+		animate(el);
+		playingClips[index] = playingClips[index].filter(c => c.fileName != fileName);
+		el.innerHTML = '';
+	} else {
+		setTimeout(() => {
+			el.classList.add('selecting');
+			document.getElementById('note-duration').innerHTML = '1 &times;';
+			document.getElementById('duration-slider').value = 4;
+			selectedFileName = fileName;
+			selectedMelodyBeatNum = index;
+			melodyNoteCell = el;
+			const noteSelectionDiv = document.getElementById('note-selection');
+			noteSelectionDiv.classList.remove('hidden');
+			const height = parseInt(document.defaultView.getComputedStyle(noteSelectionDiv).height);
+			const width = parseInt(document.defaultView.getComputedStyle(noteSelectionDiv).width);
+			const y = Math.min(event.y, innerHeight - height) - 24;
+			const x = Math.min(event.x + 18, innerWidth - width - 24);
+			noteSelectionDiv.style.top = `${y}px`;
+			noteSelectionDiv.style.left = `${x}px`;
+		}, 20);
 	}
 }
 
@@ -298,19 +302,29 @@ function toggleMelodyNote(event, fileName, index) {
 function melodyNoteSelected(event, pitchIndex) {
 	document.getElementById('note-selection').classList.add('hidden');
 	const el = event.target;
-	melodyNoteCell.innerHTML = el.innerHTML;
+	const durationSlider = document.getElementById('duration-slider');
+	const duration = Math.pow(2, durationSlider.value - 4);
+	const durationWidth = 100 * (1 + parseInt(durationSlider.value)) / (1 + parseInt(durationSlider.max));
+	let html = '';
+	html += `<div class="note-duration" style="width: ${durationWidth}%;"></div>`;
+	html += `<div>${el.innerHTML}</div>`;
+	melodyNoteCell.innerHTML = html;
 	melodyNoteCell.classList.remove('selecting');
 	melodyNoteCell.classList.add('selected');
 	animate(melodyNoteCell);
 	if (!playingClips[selectedMelodyBeatNum]) {
 		playingClips[selectedMelodyBeatNum] = [];
 	}
-	playingClips[selectedMelodyBeatNum].push({
+	const note = {
 		id: Math.floor(Math.random() * 1e12),
 		type: 'melody',
 		fileName: selectedFileName,
 		pitchIndex,
-	});
+	};
+	if (duration != 1) {
+		note.duration = duration;
+	}
+	playingClips[selectedMelodyBeatNum].push(note);
 }
 
 
@@ -325,26 +339,26 @@ function mouseOutCell(el, fileName) {
 }
 
 const shiftedBuffers = {};
-function play(clip) {
+function playMelody(clip) {
 	const source = audioCtx.createBufferSource();
-	let shiftedBuffer;
-	if (shiftedBuffers[clip.id]) {
-		shiftedBuffer = shiftedBuffers[clip.id];
-	} else {
-		const durationTime = 1000 * buffers[clip.fileName].duration;
+	if (!shiftedBuffers[clip.id]) {
+		const durationTime = 1000 * buffers[clip.fileName].duration * (clip.duration || 1);
 		// console.log(noteNames[pitchIndex]);
 		const buffer = buffers[clip.fileName];
 		const pitchShift = Math.pow(2, (clip.pitchIndex - noteNames.length / 2) / 12) * durationTime / (1000 * buffer.duration);
 		const playbackRate = 1000 * buffer.duration / durationTime;
-		source.playbackRate.value = playbackRate;
 		const inData = buffer.getChannelData(0);
 		const inDataCopy = new Float32Array(inData);
 		PitchShift(pitchShift, inDataCopy.length, 1024, 10, audioCtx.sampleRate, inDataCopy);
-		shiftedBuffer = audioCtx.createBuffer(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
+		let shiftedBuffer = audioCtx.createBuffer(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
 		shiftedBuffer.copyToChannel(inDataCopy, 0);
-		shiftedBuffers[clip.id] = shiftedBuffer;
+		shiftedBuffers[clip.id] = {
+			buffer: shiftedBuffer,
+			playbackRate,
+		};
 	}
-	source.buffer = shiftedBuffer;
+	source.playbackRate.value = shiftedBuffers[clip.id].playbackRate;
+	source.buffer = shiftedBuffers[clip.id].buffer;
 	source.connect(audioCtx.destination);
 	source.start();
 }
@@ -554,4 +568,14 @@ function clipRow(fileName) {
 	}
 	html += '</tr>';
 	return html;
+}
+
+function durationChnage() {
+	const e = document.getElementById('duration-slider').value - 4;
+	const duration = Math.pow(2, e);
+	let durationStr = duration;
+	if (e < 0) {
+		durationStr = `1/${Math.pow(2, -e)}`;
+	}
+	document.getElementById('note-duration').innerHTML = `${durationStr} &times;`;
 }

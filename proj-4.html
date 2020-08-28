@@ -89,7 +89,15 @@
 
 		</div>
 
-		<div id="note-selection" class="hidden modal" />
+		<div id="note-selection" class="hidden modal">
+			<div id="note-duration-container">
+				Duration:
+				<div id="note-duration"></div>
+				<input id="duration-slider" type="range" min="0" max="8" value="4" onInput="durationChnage()" />
+			</div>
+			<hr />
+			<div id="note-names"></div>
+		</div>
 	</body>
 
 </html>

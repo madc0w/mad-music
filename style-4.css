@@ -196,6 +196,15 @@
 	background-color: #eee;
 }
 
+#note-duration-container input {
+	width: 90%;
+}
+
+.note-duration {
+	height: 2px;
+	background-color: #4370c3;
+}
+
 #open-load-button img,
 #open-save-button img {
 	width: 32px;
