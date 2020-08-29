@@ -7,7 +7,7 @@ let isPlaying = false;
 
 const buffers = {};
 let playingClips = [];
-let selectedFileName, selectedMelodyBeatNum, melodyNoteCell, toggleButton, evolveSlider;
+let selectedFileName, selectedMelodyBeatNum, melodyNoteCell, toggleButton, evolveSlider, isSuppressCloseAll = false;
 
 function onLoad() {
 	{
@@ -70,12 +70,14 @@ function onLoad() {
 
 	const noteSelectionDiv = document.getElementById('note-selection');
 	function closeAll() {
-		noteSelectionDiv.classList.add('hidden');
-		saveModal.classList.add('hidden');
-		loadModal.classList.add('hidden');
-		shareModal.classList.add('hidden');
-		if (melodyNoteCell) {
-			melodyNoteCell.classList.remove('selecting');
+		if (!isSuppressCloseAll) {
+			noteSelectionDiv.classList.add('hidden');
+			saveModal.classList.add('hidden');
+			loadModal.classList.add('hidden');
+			shareModal.classList.add('hidden');
+			if (melodyNoteCell) {
+				melodyNoteCell.classList.remove('selecting');
+			}
 		}
 	}
 
@@ -374,7 +376,9 @@ function addRandomNote() {
 		return false;
 	}
 	if (clip.type == 'rhythm') {
+		isSuppressCloseAll = true;
 		el.click();
+		isSuppressCloseAll = false;
 	} else {
 		el.classList.add('selected');
 		animate(el);
