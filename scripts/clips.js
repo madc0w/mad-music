@@ -144,11 +144,11 @@ const clips = [
 		type: 'melody',
 	}, {
 		fileName: 'opera-female-1',
-		displayName: 'Opera Female 2',
+		displayName: 'Opera Fem. 2',
 		type: 'melody',
 	}, {
 		fileName: 'opera-female-2',
-		displayName: 'Opera Female 1',
+		displayName: 'Opera Fem. 1',
 		type: 'melody',
 		isDefault: true,
 	}, {

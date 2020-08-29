@@ -439,6 +439,14 @@ function load(name) {
 
 function setComposition(composition) {
 	tempo = composition.tempo;
+	const newBeatsPerMesaure = composition.beatsPerMesaure || 16;
+	while (beatsPerMesaure < newBeatsPerMesaure) {
+		addBeat();
+	}
+	while (beatsPerMesaure > newBeatsPerMesaure) {
+		removeBeat();
+	}
+	beatsPerMesaure = newBeatsPerMesaure;
 	document.getElementById('tempo-slider').value = (800 - tempo).toString();
 	playingClips = composition.playingClips;
 	const durationSlider = document.getElementById('duration-slider');
@@ -463,6 +471,7 @@ function setComposition(composition) {
 						cell.classList.add('note');
 						cell.classList.add(`beat-${beatsPerMesaure - i - 1}`);
 					}
+					row.insertCell(row.cells.length);
 				}
 				const cell = document.getElementById(`note-${note.fileName}-${beatNum}`);
 				cell.classList.add('selected');
@@ -522,6 +531,7 @@ function compositionData() {
 		date: new Date().getTime(),
 		playingClips,
 		tempo,
+		beatsPerMesaure,
 	};
 }
 
@@ -651,6 +661,15 @@ function addBeat() {
 function removeBeat() {
 	if (beatsPerMesaure > 2) {
 		beatsPerMesaure--;
-
+		const tables = [
+			document.getElementById('rhythm-measures-table'),
+			document.getElementById('melody-measures-table'),
+		];
+		for (const table of tables) {
+			for (let i = 0; i < table.rows.length; i++) {
+				const row = table.rows[i];
+				row.cells[row.cells.length - 2].remove();
+			}
+		}
 	}
 }
