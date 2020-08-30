@@ -57,7 +57,11 @@ const clips = [
 		type: 'rhythm',
 	}, {
 		fileName: 'ding',
-		displayName: 'Ding',
+		displayName: 'Ding 1',
+		type: 'rhythm',
+	}, {
+		fileName: 'ding-2',
+		displayName: 'Ding 2',
 		type: 'rhythm',
 	}, {
 		fileName: 'clap-1',
@@ -84,6 +88,18 @@ const clips = [
 
 	// melody
 	{
+		fileName: 'flute-1',
+		displayName: 'Flute 1',
+		type: 'melody',
+	}, {
+		fileName: 'flute-2',
+		displayName: 'Flute 2',
+		type: 'melody',
+	}, {
+		fileName: 'flute-trill',
+		displayName: 'Flute 3',
+		type: 'melody',
+	}, {
 		fileName: 'piano-note-high',
 		displayName: 'Piano High',
 		type: 'melody',
@@ -154,6 +170,26 @@ const clips = [
 	}, {
 		fileName: 'opera-tenor-1',
 		displayName: 'Opera Tenor',
+		type: 'melody',
+	}, {
+		fileName: 'fog-horn',
+		displayName: 'Fog Horn',
+		type: 'melody',
+	}, {
+		fileName: 'horn-1',
+		displayName: 'Horn',
+		type: 'melody',
+	}, {
+		fileName: 'pop-1',
+		displayName: 'Pop',
+		type: 'melody',
+	}, {
+		fileName: 'xylophone-1',
+		displayName: 'Xylophone',
+		type: 'melody',
+	}, {
+		fileName: 'glass',
+		displayName: 'glass-1',
 		type: 'melody',
 	}
 ];

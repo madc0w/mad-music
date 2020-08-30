@@ -1,13 +1,7 @@
 var tempo = 200;
 const numRandomNotes = 24;
-
-let mesaureNum = 0;
-let intervalId, evolutionIntervalId;
-let isPlaying = false;
-
 const buffers = {};
-let playingClips = [];
-let selectedFileName, selectedMelodyBeatNum, melodyNoteCell, toggleButton, evolveSlider, isSuppressCloseAll = false;
+let mesaureNum = 0, playingClips = [], intervalId, evolutionIntervalId, selectedFileName, selectedMelodyBeatNum, melodyNoteCell, toggleButton, evolveSlider, isSuppressCloseAll = false, isPlaying = false;
 
 function onLoad() {
 	{
