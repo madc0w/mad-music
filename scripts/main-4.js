@@ -468,6 +468,12 @@ function setComposition(composition) {
 						cell.id = `note-${note.fileName}-${beatsPerMesaure - i - 1}`;
 						cell.classList.add('note');
 						cell.classList.add(`beat-${beatsPerMesaure - i - 1}`);
+						console.log(cell);
+						cell.onclick = note.type = 'rhythm' ? () => {
+							toggleNote(cell, note.fileName, beatNum);
+						} : event => {
+							toggleMelodyNote(event, note.fileName, beatNum);
+						};
 					}
 					row.insertCell(row.cells.length);
 				}
