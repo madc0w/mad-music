@@ -5,7 +5,7 @@ const lowFreq = 110;
 const numWaveCompnents = 6;
 var beatsPerMesaure = 16;
 var mainLoopIntervalId;
-const baseUrl = 'https://www.gglabs.com/~mad/projects/mad-music';
+const baseUrl = 'https://www.fofolabs.com/~mad/projects/mad-music';
 
 var playingNotesDiv, stopButton;
 const noteNames = [
