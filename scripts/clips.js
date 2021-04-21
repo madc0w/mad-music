@@ -188,8 +188,8 @@ const clips = [
 		displayName: 'Xylophone',
 		type: 'melody',
 	}, {
-		fileName: 'glass',
-		displayName: 'glass-1',
+		fileName: 'glass-1',
+		displayName: 'Glass',
 		type: 'melody',
 	}
 ];

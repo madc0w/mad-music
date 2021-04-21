@@ -5,7 +5,7 @@ const lowFreq = 110;
 const numWaveCompnents = 6;
 var beatsPerMesaure = 16;
 var mainLoopIntervalId;
-const baseUrl = 'https://madc0w.github.io/mad-music/';
+const baseUrl = 'https://madc0w.github.io/mad-music';
 
 var playingNotesDiv, stopButton;
 const noteNames = [
