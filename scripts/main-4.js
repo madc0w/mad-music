@@ -381,8 +381,8 @@ function addRandomNote() {
 		const durationSlider = document.getElementById('duration-slider');
 
 		let html = '';
-		const durationVal = Math.floor(Math.random() * (1 + parseInt(durationSlider.max) - 2));
-		const durationWidth = 100 * (1 + durationVal) / (1 + parseInt(durationSlider.max));
+		const durationVal = Math.floor(Math.random() * (parseInt(durationSlider.max) - 1));
+		const durationWidth = 100 * (1 + durationVal) / (parseInt(durationSlider.max) + 1);
 		const duration = Math.pow(2, durationVal - 4);
 		html += `<div class="note-duration" style="width: ${durationWidth}%;"></div>`;
 		html += `<div>${note}</div>`;
