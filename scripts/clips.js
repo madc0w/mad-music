@@ -191,5 +191,13 @@ const clips = [
 		fileName: 'glass-1',
 		displayName: 'Glass',
 		type: 'melody',
+	}, {
+		fileName: 'screech',
+		displayName: 'Screech',
+		type: 'melody',
+	}, {
+		fileName: 'fart',
+		displayName: 'Fart',
+		type: 'melody',
 	}
 ];
