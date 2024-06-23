@@ -1,7 +1,7 @@
 const phraseGenerationProb = 0.4;
 const phraseDestructionProb = 0.16;
 const maxPhrases = 4;
-var beatsPerMesaure = 4;
+var beatsPerMeasure = 4;
 
 var phrases = [];
 var phrase;
@@ -12,11 +12,15 @@ function onLoad() {
 	playingNotesDiv = document.getElementById('playing-notes');
 	stopButton = document.getElementById('stop-button');
 	goButton = document.getElementById('go-button');
-	const beatsPerMeasureDropdown = document.getElementById('beats-per-measure-dropdown');
+	const beatsPerMeasureDropdown = document.getElementById(
+		'beats-per-measure-dropdown'
+	);
 	goButton.disabled = true;
 
-	beatsPerMeasureDropdown.onchange = e => {
-		beatsPerMesaure = parseInt(e.target.options.item(e.target.selectedIndex).innerText);
+	beatsPerMeasureDropdown.onchange = (e) => {
+		beatsPerMeasure = parseInt(
+			e.target.options.item(e.target.selectedIndex).innerText
+		);
 		stop();
 		if (buffers.length > 0) {
 			start();
@@ -32,7 +36,8 @@ function onLoad() {
 		start();
 	};
 
-	const prerecordedClips = document.getElementById('prerecorded-clips').children;
+	const prerecordedClips =
+		document.getElementById('prerecorded-clips').children;
 	for (var i = 0; i < prerecordedClips.length; i++) {
 		const el = prerecordedClips.item(i);
 		el.onclick = () => {
@@ -44,7 +49,7 @@ function onLoad() {
 			request.onload = () => {
 				addClip(url, request.response, el.innerText);
 				// el.classList.add('loaded');
-			}
+			};
 			request.send();
 		};
 	}
@@ -52,13 +57,12 @@ function onLoad() {
 	init();
 }
 
-
 function init() {
 	const toggleRecordingButton = document.getElementById('toggle-recording');
 	soundClips = document.getElementById('sound-clips');
 	let chunks = [];
 
-	let onSuccess = stream => {
+	let onSuccess = (stream) => {
 		const mediaRecorder = new MediaRecorder(stream);
 
 		var isRecording = false;
@@ -74,35 +78,40 @@ function init() {
 				toggleRecordingButton.style.color = '';
 				toggleRecordingButton.innerText = 'Record';
 			}
-		}
+		};
 
 		mediaRecorder.onstop = () => {
 			const blob = new Blob(chunks, {
-				type: 'audio/ogg; codecs=opus'
+				type: 'audio/ogg; codecs=opus',
 			});
 			chunks = [];
 			const audioUrl = window.URL.createObjectURL(blob);
-			blob.arrayBuffer().then(recordedBuffer => {
+			blob.arrayBuffer().then((recordedBuffer) => {
 				addClip(audioUrl, recordedBuffer);
 			});
-		}
+		};
 
-		mediaRecorder.ondataavailable = e => {
+		mediaRecorder.ondataavailable = (e) => {
 			chunks.push(e.data);
-		}
-	}
+		};
+	};
 
-	navigator.mediaDevices.getUserMedia({
-		audio: true
-	}).then(onSuccess, err => {
-		alert(err);
-	});
+	navigator.mediaDevices
+		.getUserMedia({
+			audio: true,
+		})
+		.then(onSuccess, (err) => {
+			alert(err);
+		});
 }
 
 var currPhraseRepeatNum = 0;
 function loop() {
 	console.log('measure: ' + ++measureNum);
-	if (phrases.length < 1 || (phrases.length < maxPhrases && Math.random() < phraseGenerationProb)) {
+	if (
+		phrases.length < 1 ||
+		(phrases.length < maxPhrases && Math.random() < phraseGenerationProb)
+	) {
 		var totalDuration = 0;
 		const phrase = [];
 		do {
@@ -117,13 +126,15 @@ function loop() {
 
 			var duration;
 			do {
-				duration = Math.ceil(Math.random() * Math.min(6, (beatsPerMesaure - 1)));
-			} while (totalDuration + tempo * duration / beatsPerMesaure > tempo);
-			const durationTime = tempo * duration / beatsPerMesaure;
+				duration = Math.ceil(Math.random() * Math.min(6, beatsPerMeasure - 1));
+			} while (totalDuration + (tempo * duration) / beatsPerMeasure > tempo);
+			const durationTime = (tempo * duration) / beatsPerMeasure;
 			// const durationTime = buffers.length * 1000;
 			const buffer = buffers[Math.floor(Math.random() * buffers.length)];
-			const pitchShift = Math.pow(2, (i - noteNames.length / 2) / 12) * durationTime / (1000 * buffer.duration);
-			const playbackRate = 1000 * buffer.duration / durationTime;
+			const pitchShift =
+				(Math.pow(2, (i - noteNames.length / 2) / 12) * durationTime) /
+				(1000 * buffer.duration);
+			const playbackRate = (1000 * buffer.duration) / durationTime;
 			const note = {
 				buffer,
 				name,
@@ -134,7 +145,7 @@ function loop() {
 			};
 			// console.log(note);
 			phrase.push(note);
-			totalDuration += tempo * duration / beatsPerMesaure;
+			totalDuration += (tempo * duration) / beatsPerMeasure;
 		} while (totalDuration < tempo);
 
 		// // for testing
@@ -153,7 +164,7 @@ function loop() {
 		// 	panNode.pan.value = Math.random() * 2 - 1;
 		// 	panNode.connect(audioCtx.destination);
 		// 	const name = noteNames[_note.i];
-		// 	const durationTime = tempo * _note.duration / beatsPerMesaure;
+		// 	const durationTime = tempo * _note.duration / beatsPerMeasure;
 		// 	const buffer = buffers[Math.floor(Math.random() * buffers.length)];
 		// 	const pitchShift = Math.pow(2, (_note.i - noteNames.length / 2) / 12) * durationTime / (1000 * buffer.duration);
 		// 	const playbackRate = 1000 * buffer.duration / durationTime;
@@ -191,8 +202,19 @@ function loop() {
 			source.playbackRate.value = note.playbackRate;
 			const inData = note.buffer.getChannelData(0);
 			const inDataCopy = new Float32Array(inData);
-			PitchShift(note.pitchShift, inDataCopy.length, 1024, 10, audioCtx.sampleRate, inDataCopy);
-			const audioBufferCopy = audioCtx.createBuffer(note.buffer.numberOfChannels, note.buffer.length, note.buffer.sampleRate);
+			PitchShift(
+				note.pitchShift,
+				inDataCopy.length,
+				1024,
+				10,
+				audioCtx.sampleRate,
+				inDataCopy
+			);
+			const audioBufferCopy = audioCtx.createBuffer(
+				note.buffer.numberOfChannels,
+				note.buffer.length,
+				note.buffer.sampleRate
+			);
 			audioBufferCopy.copyToChannel(inDataCopy, 0);
 			source.buffer = audioBufferCopy;
 
@@ -207,7 +229,7 @@ function loop() {
 			prevNote = note;
 			refreshDisplay();
 		}, delay);
-		delay += tempo * note.duration / beatsPerMesaure;
+		delay += (tempo * note.duration) / beatsPerMeasure;
 		refreshDisplay();
 	}
 }
@@ -262,13 +284,13 @@ function addClip(audioUrl, recordedBuffer, name) {
 
 	audio.controls = true;
 	audio.src = audioUrl;
-	audioCtx.decodeAudioData(recordedBuffer, audioBuffer => {
+	audioCtx.decodeAudioData(recordedBuffer, (audioBuffer) => {
 		goButton.disabled = false;
 		deleteButton.bufferIndex = buffers.length;
 		buffers.push(audioBuffer);
 	});
 
-	deleteButton.onclick = e => {
+	deleteButton.onclick = (e) => {
 		let button = e.target;
 		buffers.splice(button.bufferIndex, 1);
 		if (buffers.length == 0) {
@@ -278,5 +300,5 @@ function addClip(audioUrl, recordedBuffer, name) {
 			clearInterval(mainLoopIntervalId);
 		}
 		button.parentNode.parentNode.removeChild(button.parentNode);
-	}
+	};
 }

@@ -1,11 +1,21 @@
 var tempo = 200;
 const numRandomNotes = 24;
 const buffers = {};
-let mesaureNum = 0, playingClips = [], intervalId, evolutionIntervalId, selectedFileName, selectedMelodyBeatNum, melodyNoteCell, toggleButton, evolveSlider, isSuppressCloseAll = false, isPlaying = false;
+let measureNum = 0,
+	playingClips = [],
+	intervalId,
+	evolutionIntervalId,
+	selectedFileName,
+	selectedMelodyBeatNum,
+	melodyNoteCell,
+	toggleButton,
+	evolveSlider,
+	isSuppressCloseAll = false,
+	isPlaying = false;
 
 function onLoad() {
 	{
-		document.getElementById('save-button').onclick = event => {
+		document.getElementById('save-button').onclick = (event) => {
 			const saved = localStorage.saved ? JSON.parse(localStorage.saved) : {};
 			saved[document.getElementById('save-name').value] = compositionData();
 			localStorage.saved = JSON.stringify(saved);
@@ -16,7 +26,7 @@ function onLoad() {
 	const saveModal = document.getElementById('save-modal');
 	const loadModal = document.getElementById('load-modal');
 	const shareModal = document.getElementById('share-modal');
-	document.getElementById('open-load-button').onclick = event => {
+	document.getElementById('open-load-button').onclick = (event) => {
 		setTimeout(() => {
 			const table = document.getElementById('compositions-list');
 			let html = '';
@@ -29,7 +39,12 @@ function onLoad() {
 			for (const name in allCompositions) {
 				html += `<tr class="row" onClick="load('${name}')">`;
 				const date = new Date(allCompositions[name].date);
-				const dateStr = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
+				const dateStr =
+					date.getFullYear() +
+					'/' +
+					(date.getMonth() + 1) +
+					'/' +
+					date.getDate();
 				html += `<td>${dateStr}</td>`;
 				html += `<td>${name}</td>`;
 				html += '</tr>';
@@ -38,13 +53,13 @@ function onLoad() {
 			loadModal.classList.remove('hidden');
 		}, 20);
 	};
-	document.getElementById('open-save-button').onclick = event => {
+	document.getElementById('open-save-button').onclick = (event) => {
 		setTimeout(() => {
 			saveModal.classList.remove('hidden');
 			document.getElementById('save-name').focus();
 		}, 20);
 	};
-	document.getElementById('open-share-button').onclick = event => {
+	document.getElementById('open-share-button').onclick = (event) => {
 		setTimeout(() => {
 			shareModal.classList.remove('hidden');
 			const shareUrlInput = document.getElementById('share-url');
@@ -58,7 +73,6 @@ function onLoad() {
 			shareUrlInput.select();
 			shareUrlInput.setSelectionRange(0, 1e6); // For mobile devices
 			document.execCommand('copy');
-
 		}, 20);
 	};
 
@@ -75,12 +89,12 @@ function onLoad() {
 		}
 	}
 
-	document.onkeyup = event => {
+	document.onkeyup = (event) => {
 		if (event.key == 'Escape') {
 			closeAll();
 		}
 	};
-	document.onclick = event => {
+	document.onclick = (event) => {
 		if (event.target.tagName != 'INPUT') {
 			closeAll();
 		}
@@ -91,7 +105,11 @@ function onLoad() {
 		const numCols = 2;
 		for (let col = 0; col < numCols; col++) {
 			html += '<div class="col">';
-			for (let i = col * noteNames.length / numCols; i < (col + 1) * noteNames.length / numCols; i++) {
+			for (
+				let i = (col * noteNames.length) / numCols;
+				i < ((col + 1) * noteNames.length) / numCols;
+				i++
+			) {
 				html += `<div onClick="melodyNoteSelected(event, ${i})">${noteNames[i]}</div>`;
 			}
 			html += '</div>';
@@ -101,17 +119,25 @@ function onLoad() {
 	{
 		const evolveCheckbox = document.getElementById('evolve-checkbox');
 		evolveSlider = document.getElementById('evolution-slider');
-		const evolveSliderContainer = document.getElementById('evolution-slider-container');
+		const evolveSliderContainer = document.getElementById(
+			'evolution-slider-container'
+		);
 		evolveSlider.onchange = () => {
 			clearInterval(evolutionIntervalId);
-			evolutionIntervalId = setInterval(evolve, 8000 - evolveSlider.value * 600);
+			evolutionIntervalId = setInterval(
+				evolve,
+				8000 - evolveSlider.value * 600
+			);
 		};
 		evolveCheckbox.onchange = () => {
 			clearInterval(evolutionIntervalId);
 			evolutionIntervalId = null;
 			if (evolveCheckbox.checked) {
 				evolveSliderContainer.classList.remove('hidden');
-				evolutionIntervalId = setInterval(evolve, 8000 - evolveSlider.value * 600);
+				evolutionIntervalId = setInterval(
+					evolve,
+					8000 - evolveSlider.value * 600
+				);
 			} else {
 				evolveSliderContainer.classList.add('hidden');
 			}
@@ -123,12 +149,13 @@ function onLoad() {
 		html += '<caption>Instant music. Just add rhythm...</caption>';
 		html += '<tr>';
 		html += '<td />';
-		for (let i = 0; i < beatsPerMesaure; i++) {
+		for (let i = 0; i < beatsPerMeasure; i++) {
 			html += `<td class="beat-number" id="beat-${i}">${i + 1}</td>`;
 		}
-		html += '<td id="add-remove-beat"><img src="icons/add_circle-24px.svg" onClick="addBeat()"/><img src="icons/remove_circle-24px.svg" onClick="removeBeat()"/></td>';
+		html +=
+			'<td id="add-remove-beat"><img src="icons/add_circle-24px.svg" onClick="addBeat()"/><img src="icons/remove_circle-24px.svg" onClick="removeBeat()"/></td>';
 		html += '</tr>';
-		for (const clip of clips.filter(c => c.type == 'rhythm' && c.isDefault)) {
+		for (const clip of clips.filter((c) => c.type == 'rhythm' && c.isDefault)) {
 			html += clipRow(clip.fileName);
 		}
 		rhythmMeasures.innerHTML = html;
@@ -138,7 +165,7 @@ function onLoad() {
 		const melodyMeasures = document.getElementById('melody-measures-table');
 		let html = '';
 		html += '<caption>And melody!</caption>';
-		for (const clip of clips.filter(c => c.type == 'melody' && c.isDefault)) {
+		for (const clip of clips.filter((c) => c.type == 'melody' && c.isDefault)) {
 			html += clipRow(clip.fileName);
 		}
 		melodyMeasures.innerHTML = html;
@@ -146,7 +173,7 @@ function onLoad() {
 	}
 
 	const tempoSlider = document.getElementById('tempo-slider');
-	tempoSlider.onchange = el => {
+	tempoSlider.onchange = (el) => {
 		tempo = 800 - parseInt(el.target.value);
 		if (isPlaying) {
 			clearInterval(intervalId);
@@ -186,29 +213,36 @@ function onLoad() {
 		request.open('GET', url, true);
 		request.responseType = 'arraybuffer';
 		request.onload = () => {
-			audioCtx.decodeAudioData(request.response, audioBuffer => {
+			audioCtx.decodeAudioData(request.response, (audioBuffer) => {
 				buffers[clip.fileName] = audioBuffer;
 			});
-		}
+		};
 		request.send();
 	}
 
 	if (location.search && location.search.startsWith('?composition=')) {
-		const composition = JSON.parse(decodeURI(location.search.substring('?composition='.length)));
+		const composition = JSON.parse(
+			decodeURI(location.search.substring('?composition='.length))
+		);
 		setComposition(composition);
 	}
-
 }
 
 function loop() {
-	if (document.getElementById('evolve-checkbox').checked && !evolutionIntervalId) {
-		evolutionIntervalId = setInterval(evolve, 8000 - evolveSlider.value * tempo);
+	if (
+		document.getElementById('evolve-checkbox').checked &&
+		!evolutionIntervalId
+	) {
+		evolutionIntervalId = setInterval(
+			evolve,
+			8000 - evolveSlider.value * tempo
+		);
 	}
 
-	const beatNum = mesaureNum % beatsPerMesaure;
+	const beatNum = measureNum % beatsPerMeasure;
 	const clips = playingClips[beatNum];
 	if (clips) {
-		for (let clip of clips) {
+		for (const clip of clips) {
 			const source = audioCtx.createBufferSource();
 			source.connect(audioCtx.destination);
 			if (clip.type == 'melody') {
@@ -220,7 +254,7 @@ function loop() {
 		}
 	}
 
-	for (let i = 0; i < beatsPerMesaure; i++) {
+	for (let i = 0; i < beatsPerMeasure; i++) {
 		const beatTd = document.getElementById(`beat-${i}`);
 		if (beatNum == i) {
 			beatTd.classList.add('current');
@@ -240,7 +274,7 @@ function loop() {
 			noteCell.classList.add('current');
 		}
 	}
-	mesaureNum++;
+	measureNum++;
 }
 
 function toggleNote(el, fileName, index) {
@@ -249,8 +283,10 @@ function toggleNote(el, fileName, index) {
 	if (!playingClips[index]) {
 		playingClips[index] = [];
 	}
-	if (playingClips[index].find(c => c.fileName == fileName)) {
-		playingClips[index] = playingClips[index].filter(c => c.fileName != fileName);
+	if (playingClips[index].find((c) => c.fileName == fileName)) {
+		playingClips[index] = playingClips[index].filter(
+			(c) => c.fileName != fileName
+		);
 	} else {
 		playingClips[index].push({
 			id: Math.floor(Math.random() * 1e12),
@@ -272,7 +308,9 @@ function toggleMelodyNote(event, fileName, index) {
 	if (isSelected) {
 		el.classList.remove('selected');
 		animate(el);
-		playingClips[index] = playingClips[index].filter(c => c.fileName != fileName);
+		playingClips[index] = playingClips[index].filter(
+			(c) => c.fileName != fileName
+		);
 		el.innerHTML = '';
 	} else {
 		setTimeout(() => {
@@ -284,8 +322,12 @@ function toggleMelodyNote(event, fileName, index) {
 			melodyNoteCell = el;
 			const noteSelectionDiv = document.getElementById('note-selection');
 			noteSelectionDiv.classList.remove('hidden');
-			const height = parseInt(document.defaultView.getComputedStyle(noteSelectionDiv).height);
-			const width = parseInt(document.defaultView.getComputedStyle(noteSelectionDiv).width);
+			const height = parseInt(
+				document.defaultView.getComputedStyle(noteSelectionDiv).height
+			);
+			const width = parseInt(
+				document.defaultView.getComputedStyle(noteSelectionDiv).width
+			);
 			const y = Math.min(event.y, innerHeight - height) - 24;
 			const x = Math.min(event.x + 18, innerWidth - width - 24);
 			noteSelectionDiv.style.top = `${y}px`;
@@ -294,13 +336,14 @@ function toggleMelodyNote(event, fileName, index) {
 	}
 }
 
-
 function melodyNoteSelected(event, pitchIndex) {
 	document.getElementById('note-selection').classList.add('hidden');
 	const el = event.target;
 	const durationSlider = document.getElementById('duration-slider');
 	const duration = Math.pow(2, durationSlider.value - 4);
-	const durationWidth = 100 * (1 + parseInt(durationSlider.value)) / (1 + parseInt(durationSlider.max));
+	const durationWidth =
+		(100 * (1 + parseInt(durationSlider.value))) /
+		(1 + parseInt(durationSlider.max));
 	let html = '';
 	html += `<div class="note-duration" style="width: ${durationWidth}%;"></div>`;
 	html += `<div>${el.innerHTML}</div>`;
@@ -323,7 +366,6 @@ function melodyNoteSelected(event, pitchIndex) {
 	playingClips[selectedMelodyBeatNum].push(note);
 }
 
-
 function mouseOverCell(el, fileName) {
 	const cell = document.getElementById(`clip-name-${fileName}`);
 	cell.classList.add('selected');
@@ -338,15 +380,30 @@ const shiftedBuffers = {};
 function playMelody(clip) {
 	const source = audioCtx.createBufferSource();
 	if (!shiftedBuffers[clip.id]) {
-		const durationTime = 1000 * buffers[clip.fileName].duration * (clip.duration || 1);
+		const durationTime =
+			1000 * buffers[clip.fileName].duration * (clip.duration || 1);
 		// console.log(noteNames[pitchIndex]);
 		const buffer = buffers[clip.fileName];
-		const pitchShift = Math.pow(2, (clip.pitchIndex - noteNames.length / 2) / 12) * durationTime / (1000 * buffer.duration);
-		const playbackRate = 1000 * buffer.duration / durationTime;
+		const pitchShift =
+			(Math.pow(2, (clip.pitchIndex - noteNames.length / 2) / 12) *
+				durationTime) /
+			(1000 * buffer.duration);
+		const playbackRate = (1000 * buffer.duration) / durationTime;
 		const inData = buffer.getChannelData(0);
 		const inDataCopy = new Float32Array(inData);
-		PitchShift(pitchShift, inDataCopy.length, 1024, 10, audioCtx.sampleRate, inDataCopy);
-		let shiftedBuffer = audioCtx.createBuffer(buffer.numberOfChannels, buffer.length, buffer.sampleRate);
+		PitchShift(
+			pitchShift,
+			inDataCopy.length,
+			1024,
+			10,
+			audioCtx.sampleRate,
+			inDataCopy
+		);
+		let shiftedBuffer = audioCtx.createBuffer(
+			buffer.numberOfChannels,
+			buffer.length,
+			buffer.sampleRate
+		);
 		shiftedBuffer.copyToChannel(inDataCopy, 0);
 		shiftedBuffers[clip.id] = {
 			buffer: shiftedBuffer,
@@ -360,12 +417,20 @@ function playMelody(clip) {
 }
 
 function addRandomNote() {
-	let el, beatNum, clip, i = 0;
+	let el,
+		beatNum,
+		clip,
+		i = 0;
 	do {
-		beatNum = Math.floor(Math.random() * beatsPerMesaure);
+		beatNum = Math.floor(Math.random() * beatsPerMeasure);
 		clip = clips[Math.floor(Math.random() * clips.length)];
 		el = document.getElementById(`note-${clip.fileName}-${beatNum}`);
-	} while ((!el || (playingClips[beatNum] && playingClips[beatNum].find(c => c.fileName == clip.fileName))) && i++ < 80);
+	} while (
+		(!el ||
+			(playingClips[beatNum] &&
+				playingClips[beatNum].find((c) => c.fileName == clip.fileName))) &&
+		i++ < 80
+	);
 	if (i > 80) {
 		return false;
 	}
@@ -381,8 +446,11 @@ function addRandomNote() {
 		const durationSlider = document.getElementById('duration-slider');
 
 		let html = '';
-		const durationVal = Math.floor(Math.random() * (parseInt(durationSlider.max) - 1));
-		const durationWidth = 100 * (1 + durationVal) / (parseInt(durationSlider.max) + 1);
+		const durationVal = Math.floor(
+			Math.random() * (parseInt(durationSlider.max) - 1)
+		);
+		const durationWidth =
+			(100 * (1 + durationVal)) / (parseInt(durationSlider.max) + 1);
 		const duration = Math.pow(2, durationVal - 4);
 		html += `<div class="note-duration" style="width: ${durationWidth}%;"></div>`;
 		html += `<div>${note}</div>`;
@@ -413,18 +481,24 @@ function removeRandomNote() {
 	}
 	if (notes.length > 0) {
 		const toRemove = notes[Math.floor(Math.random() * notes.length)];
-		const removingClip = playingClips[toRemove.i].find(c => c.fileName == toRemove.fileName);
-		const el = document.getElementById(`note-${removingClip.fileName}-${toRemove.i}`);
+		const removingClip = playingClips[toRemove.i].find(
+			(c) => c.fileName == toRemove.fileName
+		);
+		const el = document.getElementById(
+			`note-${removingClip.fileName}-${toRemove.i}`
+		);
 		el.innerHTML = '';
 		el.classList.remove('selected');
 		animate(el);
-		playingClips[toRemove.i] = playingClips[toRemove.i].filter(c => c.fileName != toRemove.fileName);
+		playingClips[toRemove.i] = playingClips[toRemove.i].filter(
+			(c) => c.fileName != toRemove.fileName
+		);
 	}
 }
 
 function load(name) {
 	reset();
-	let composition = (localStorage.saved && JSON.parse(localStorage.saved)[name]);
+	let composition = localStorage.saved && JSON.parse(localStorage.saved)[name];
 	const saveNameInput = document.getElementById('save-name');
 	if (composition) {
 		saveNameInput.value = name;
@@ -437,14 +511,14 @@ function load(name) {
 
 function setComposition(composition) {
 	tempo = composition.tempo;
-	const newBeatsPerMesaure = composition.beatsPerMesaure || 16;
-	while (beatsPerMesaure < newBeatsPerMesaure) {
+	const newBeatsPerMeasure = composition.beatsPerMeasure || 16;
+	while (beatsPerMeasure < newBeatsPerMeasure) {
 		addBeat();
 	}
-	while (beatsPerMesaure > newBeatsPerMesaure) {
+	while (beatsPerMeasure > newBeatsPerMeasure) {
 		removeBeat();
 	}
-	beatsPerMesaure = newBeatsPerMesaure;
+	beatsPerMeasure = newBeatsPerMeasure;
 	document.getElementById('tempo-slider').value = (800 - tempo).toString();
 	playingClips = composition.playingClips;
 	const durationSlider = document.getElementById('duration-slider');
@@ -453,35 +527,45 @@ function setComposition(composition) {
 			for (let note of playingClips[beatNum]) {
 				let row = document.getElementById(`clip-row-${note.fileName}`);
 				if (!row) {
-					const tableEl = document.getElementById(`${note.type}-measures-table`);
+					const tableEl = document.getElementById(
+						`${note.type}-measures-table`
+					);
 					row = tableEl.insertRow(note.type == 'rhythm' ? 1 : 0);
 					row.id = `clip-row-${note.fileName}`;
 					{
 						const cell = row.insertCell(0);
 						cell.id = `clip-name-${note.fileName}`;
 						cell.classList.add('clip-name');
-						const displayName = clips.find(c => c.fileName == note.fileName).displayName;
+						const displayName = clips.find(
+							(c) => c.fileName == note.fileName
+						).displayName;
 						cell.innerHTML = `<img src="icons/close-24px.svg" onClick="removeClip('${note.fileName}')"/>${displayName}`;
 					}
-					for (let i = 0; i < beatsPerMesaure; i++) {
+					for (let i = 0; i < beatsPerMeasure; i++) {
 						const cell = row.insertCell(1);
-						cell.id = `note-${note.fileName}-${beatsPerMesaure - i - 1}`;
+						cell.id = `note-${note.fileName}-${beatsPerMeasure - i - 1}`;
 						cell.classList.add('note');
-						cell.classList.add(`beat-${beatsPerMesaure - i - 1}`);
+						cell.classList.add(`beat-${beatsPerMeasure - i - 1}`);
 						console.log(cell);
-						cell.onclick = note.type = 'rhythm' ? () => {
-							toggleNote(cell, note.fileName, beatNum);
-						} : event => {
-							toggleMelodyNote(event, note.fileName, beatNum);
-						};
+						cell.onclick = note.type = 'rhythm'
+							? () => {
+									toggleNote(cell, note.fileName, beatNum);
+							  }
+							: (event) => {
+									toggleMelodyNote(event, note.fileName, beatNum);
+							  };
 					}
 					row.insertCell(row.cells.length);
 				}
-				const cell = document.getElementById(`note-${note.fileName}-${beatNum}`);
+				const cell = document.getElementById(
+					`note-${note.fileName}-${beatNum}`
+				);
 				cell.classList.add('selected');
 				if (note.type == 'melody') {
 					let html = '';
-					const durationWidth = 100 * (1 + Math.log2(note.duration || 1) + 4) / (1 + parseInt(durationSlider.max));
+					const durationWidth =
+						(100 * (1 + Math.log2(note.duration || 1) + 4)) /
+						(1 + parseInt(durationSlider.max));
 					html += `<div class="note-duration" style="width: ${durationWidth}%;"></div>`;
 					html += `<div>${noteNames[note.pitchIndex]}</div>`;
 					cell.innerHTML = html;
@@ -508,7 +592,7 @@ function reset() {
 	for (const el of beatNumEls) {
 		el.classList.remove('current');
 	}
-	mesaureNum = 0;
+	measureNum = 0;
 }
 
 function animate(el) {
@@ -528,23 +612,25 @@ function animate(el) {
 function evolve() {
 	addRandomNote();
 	removeRandomNote();
-};
+}
 
 function compositionData() {
 	return {
 		date: new Date().getTime(),
 		playingClips,
 		tempo,
-		beatsPerMesaure,
+		beatsPerMeasure,
 	};
 }
 
 function removeClip(fileName) {
-	const type = clips.find(c => c.fileName == fileName).type;
+	const type = clips.find((c) => c.fileName == fileName).type;
 	const rowEl = document.getElementById(`clip-row-${fileName}`);
 	rowEl.remove();
 	for (const beatNum in playingClips) {
-		playingClips[beatNum] = playingClips[beatNum].filter(c => c.fileName != fileName);
+		playingClips[beatNum] = playingClips[beatNum].filter(
+			(c) => c.fileName != fileName
+		);
 	}
 	setAddClipRow(type);
 }
@@ -554,7 +640,7 @@ function setAddClipRow(type) {
 	html += `<select onChange="addClip(this, '${type}')">`;
 	html += '<option>Add a clip</option>';
 	let count = 0;
-	for (const clip of clips.filter(c => c.type == type)) {
+	for (const clip of clips.filter((c) => c.type == type)) {
 		if (!document.getElementById(`clip-name-${clip.fileName}`)) {
 			html += `<option filename="${clip.fileName}">${clip.displayName}</option>`;
 			count++;
@@ -566,7 +652,6 @@ function setAddClipRow(type) {
 	}
 	document.getElementById(`add-clip-container-${type}`).innerHTML = html;
 }
-
 
 function addClip(selectEl, type) {
 	const optionEl = selectEl.selectedOptions[0];
@@ -580,13 +665,13 @@ function addClip(selectEl, type) {
 }
 
 function clipRow(fileName) {
-	const displayName = clips.find(c => c.fileName == fileName).displayName;
+	const displayName = clips.find((c) => c.fileName == fileName).displayName;
 	let html = `<tr id="clip-row-${fileName}">`;
 	html += `<td class="clip-name" id="clip-name-${fileName}">`;
 	html += `<img src="icons/close-24px.svg" onClick="removeClip('${fileName}')"/>`;
 	html += displayName;
 	html += '</td>';
-	for (let i = 0; i < beatsPerMesaure; i++) {
+	for (let i = 0; i < beatsPerMeasure; i++) {
 		html += clipCell(fileName, i);
 	}
 	html += '<td></td>';
@@ -595,8 +680,11 @@ function clipRow(fileName) {
 }
 
 function clipCell(fileName, i) {
-	const type = clips.find(c => c.fileName == fileName).type;
-	const onClick = type == 'rhythm' ? `toggleNote(this, '${fileName}', ${i})` : `toggleMelodyNote(event, '${fileName}', ${i})`;
+	const type = clips.find((c) => c.fileName == fileName).type;
+	const onClick =
+		type == 'rhythm'
+			? `toggleNote(this, '${fileName}', ${i})`
+			: `toggleMelodyNote(event, '${fileName}', ${i})`;
 	return `<td class="note beat-${i}" id="note-${fileName}-${i}" onClick="${onClick}" onMouseOut="mouseOutCell(this, '${fileName}')" onMouseOver="mouseOverCell(this, '${fileName}')"/>`;
 }
 
@@ -611,13 +699,13 @@ function durationChnage() {
 }
 
 function addBeat() {
-	beatsPerMesaure++;
-	const beatNum = beatsPerMesaure - 1;
+	beatsPerMeasure++;
+	const beatNum = beatsPerMeasure - 1;
 	{
 		const table = document.getElementById('rhythm-measures-table');
 		const headerRow = table.rows[0];
 		const headerCell = headerRow.insertCell(headerRow.cells.length - 1);
-		headerCell.innerHTML = beatsPerMesaure;
+		headerCell.innerHTML = beatsPerMeasure;
 		headerCell.id = `beat-${beatNum}`;
 		headerCell.classList.add('beat-number');
 		for (let i = 1; i < table.rows.length; i++) {
@@ -649,7 +737,7 @@ function addBeat() {
 			cell.classList.add('note');
 			cell.classList.add(`beat-${beatNum}`);
 			cell.id = `note-${fileName}-${beatNum}`;
-			cell.onclick = event => {
+			cell.onclick = (event) => {
 				toggleMelodyNote(event, fileName, beatNum);
 			};
 			cell.onmouseover = () => {
@@ -663,8 +751,8 @@ function addBeat() {
 }
 
 function removeBeat() {
-	if (beatsPerMesaure > 2) {
-		beatsPerMesaure--;
+	if (beatsPerMeasure > 2) {
+		beatsPerMeasure--;
 		const tables = [
 			document.getElementById('rhythm-measures-table'),
 			document.getElementById('melody-measures-table'),
@@ -677,4 +765,3 @@ function removeBeat() {
 		}
 	}
 }
-

@@ -3,13 +3,34 @@ const attack = 0.6;
 const decay = 0.3;
 const lowFreq = 110;
 const numWaveCompnents = 6;
-var beatsPerMesaure = 16;
+var beatsPerMeasure = 16;
 var mainLoopIntervalId;
 const baseUrl = 'https://madc0w.github.io/mad-music';
 
 var playingNotesDiv, stopButton;
 const noteNames = [
-	'A3', 'A3#', 'B3', 'C3', 'C3#', 'D3', 'D3#', 'E3', 'F3', 'F3#', 'G3', 'A4', 'A4#', 'B4', 'C4', 'C4#', 'D4', 'D4#', 'E4', 'F4', 'F4#', 'G4',
+	'A3',
+	'A3#',
+	'B3',
+	'C3',
+	'C3#',
+	'D3',
+	'D3#',
+	'E3',
+	'F3',
+	'F3#',
+	'G3',
+	'A4',
+	'A4#',
+	'B4',
+	'C4',
+	'C4#',
+	'D4',
+	'D4#',
+	'E4',
+	'F4',
+	'F4#',
+	'G4',
 ];
 
 var measureNum = 0;
@@ -39,11 +60,9 @@ function start() {
 	loop();
 }
 
-function init() {
-}
+function init() {}
 
-function initLoop() {
-}
+function initLoop() {}
 
 function play(note, done) {
 	setTimeout(() => {
@@ -52,8 +71,8 @@ function play(note, done) {
 		ramp(note, true);
 		setTimeout(() => {
 			ramp(note, false, done);
-		}, (note.duration * tempo / beatsPerMesaure) - decay);
-	}, (note.delay || 0) * tempo / beatsPerMesaure);
+		}, (note.duration * tempo) / beatsPerMeasure - decay);
+	}, ((note.delay || 0) * tempo) / beatsPerMeasure);
 }
 
 function ramp(note, isUp, done) {
@@ -80,10 +99,13 @@ function ramp(note, isUp, done) {
 	}
 	note.ramping = isUp ? 'up' : 'down';
 	const startTime = audioCtx.currentTime;
-	const endTime = startTime + (note.duration * tempo / beatsPerMesaure) * (isUp ? attack : decay) / 1000;
+	const endTime =
+		startTime +
+		(((note.duration * tempo) / beatsPerMeasure) * (isUp ? attack : decay)) /
+			1000;
 	var val = isUp ? 0 : 1;
 	const interval = 4;
-	const step = (isUp ? 1 : -1) * interval / (1000 * (endTime - startTime));
+	const step = ((isUp ? 1 : -1) * interval) / (1000 * (endTime - startTime));
 	// console.log('step', step);
 	note.intervalId = setInterval(() => {
 		if ((val == 0 && !isUp) || (val == 1 && isUp)) {
@@ -114,7 +136,6 @@ function ramp(note, isUp, done) {
 		}
 	}, interval);
 }
-
 
 function setRandomWave(oscillator) {
 	const real = new Float32Array(numWaveCompnents + 1);
