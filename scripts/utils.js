@@ -33,7 +33,7 @@ const noteNames = [
 	'G4',
 ];
 
-var measureNum = 0;
+let measureNum = 0;
 const audioCtx = new AudioContext();
 
 function onLoad() {

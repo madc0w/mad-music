@@ -1,8 +1,7 @@
 var tempo = 200;
 const numRandomNotes = 24;
 const buffers = {};
-let measureNum = 0,
-	playingClips = [],
+let playingClips = [],
 	intervalId,
 	evolutionIntervalId,
 	selectedFileName,
@@ -220,7 +219,7 @@ function onLoad() {
 		request.send();
 	}
 
-	if (location.search && location.search.startsWith('?composition=')) {
+	if (location.search?.startsWith('?composition=')) {
 		const composition = JSON.parse(
 			decodeURI(location.search.substring('?composition='.length))
 		);
