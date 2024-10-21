@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/madc0w/mad-music#readme",
   "dependencies": {
+    "mad-music": "file:",
     "pitch-shift-node": "^0.1.0"
   }
 }
