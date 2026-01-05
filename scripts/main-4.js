@@ -147,6 +147,8 @@ function onLoad() {
 		let html = '';
 		html += '<caption>Instant music. Just add rhythm...</caption>';
 		html += '<tr>';
+		html += '<td class="checkbox-header">Freeze</td>';
+		html += '<td class="checkbox-header">Mute</td>';
 		html += '<td />';
 		for (let i = 0; i < beatsPerMeasure; i++) {
 			html += `<td class="beat-number" id="beat-${i}">${i + 1}</td>`;
@@ -239,9 +241,12 @@ function loop() {
 	}
 
 	const beatNum = measureNum % beatsPerMeasure;
-	const clips = playingClips[beatNum];
-	if (clips) {
-		for (const clip of clips) {
+	const clipsToPlay = playingClips[beatNum];
+	if (clipsToPlay) {
+		for (const clip of clipsToPlay) {
+			if (isRowMuted(clip.fileName)) {
+				continue;
+			}
 			const source = audioCtx.createBufferSource();
 			source.connect(audioCtx.destination);
 			if (clip.type == 'melody') {
@@ -426,6 +431,7 @@ function addRandomNote() {
 		el = document.getElementById(`note-${clip.fileName}-${beatNum}`);
 	} while (
 		(!el ||
+			isRowFrozen(clip.fileName) ||
 			(playingClips[beatNum] &&
 				playingClips[beatNum].find((c) => c.fileName == clip.fileName))) &&
 		i++ < 80
@@ -472,10 +478,12 @@ function removeRandomNote() {
 	const notes = [];
 	for (let i in playingClips) {
 		for (const c of playingClips[i]) {
-			notes.push({
-				i,
-				fileName: c.fileName,
-			});
+			if (!isRowFrozen(c.fileName)) {
+				notes.push({
+					i,
+					fileName: c.fileName,
+				});
+			}
 		}
 	}
 	if (notes.length > 0) {
@@ -532,7 +540,17 @@ function setComposition(composition) {
 					row = tableEl.insertRow(note.type == 'rhythm' ? 1 : 0);
 					row.id = `clip-row-${note.fileName}`;
 					{
-						const cell = row.insertCell(0);
+						const freezeCell = row.insertCell(0);
+						freezeCell.classList.add('checkbox-cell');
+						freezeCell.innerHTML = `<input type="checkbox" class="freeze-checkbox" id="freeze-${note.fileName}" />`;
+					}
+					{
+						const muteCell = row.insertCell(1);
+						muteCell.classList.add('checkbox-cell');
+						muteCell.innerHTML = `<input type="checkbox" class="mute-checkbox" id="mute-${note.fileName}" onchange="toggleMute('${note.fileName}')" />`;
+					}
+					{
+						const cell = row.insertCell(2);
 						cell.id = `clip-name-${note.fileName}`;
 						cell.classList.add('clip-name');
 						const displayName = clips.find(
@@ -541,7 +559,7 @@ function setComposition(composition) {
 						cell.innerHTML = `<img src="icons/close-24px.svg" onClick="removeClip('${note.fileName}')"/>${displayName}`;
 					}
 					for (let i = 0; i < beatsPerMeasure; i++) {
-						const cell = row.insertCell(1);
+						const cell = row.insertCell(3);
 						cell.id = `note-${note.fileName}-${beatsPerMeasure - i - 1}`;
 						cell.classList.add('note');
 						cell.classList.add(`beat-${beatsPerMeasure - i - 1}`);
@@ -569,6 +587,24 @@ function setComposition(composition) {
 					html += `<div>${noteNames[note.pitchIndex]}</div>`;
 					cell.innerHTML = html;
 				}
+			}
+		}
+	}
+	// Restore mute and freeze states
+	if (composition.muteStates) {
+		for (const fileName in composition.muteStates) {
+			const muteCheckbox = document.getElementById(`mute-${fileName}`);
+			if (muteCheckbox) {
+				muteCheckbox.checked = true;
+				toggleMute(fileName);
+			}
+		}
+	}
+	if (composition.freezeStates) {
+		for (const fileName in composition.freezeStates) {
+			const freezeCheckbox = document.getElementById(`freeze-${fileName}`);
+			if (freezeCheckbox) {
+				freezeCheckbox.checked = true;
 			}
 		}
 	}
@@ -614,11 +650,27 @@ function evolve() {
 }
 
 function compositionData() {
+	const muteStates = {};
+	const freezeStates = {};
+	for (const checkbox of document.querySelectorAll('.mute-checkbox')) {
+		const fileName = checkbox.id.substring('mute-'.length);
+		if (checkbox.checked) {
+			muteStates[fileName] = true;
+		}
+	}
+	for (const checkbox of document.querySelectorAll('.freeze-checkbox')) {
+		const fileName = checkbox.id.substring('freeze-'.length);
+		if (checkbox.checked) {
+			freezeStates[fileName] = true;
+		}
+	}
 	return {
 		date: new Date().getTime(),
 		playingClips,
 		tempo,
 		beatsPerMeasure,
+		muteStates,
+		freezeStates,
 	};
 }
 
@@ -657,8 +709,8 @@ function addClip(selectEl, type) {
 	const fileName = optionEl.getAttribute('filename');
 	if (fileName) {
 		optionEl.remove();
-		const tabelEl = document.getElementById(`${type}-measures-table`);
-		tabelEl.innerHTML += clipRow(fileName);
+		const tableEl = document.getElementById(`${type}-measures-table`);
+		tableEl.insertAdjacentHTML('beforeend', clipRow(fileName));
 		setAddClipRow(type);
 	}
 }
@@ -666,6 +718,8 @@ function addClip(selectEl, type) {
 function clipRow(fileName) {
 	const displayName = clips.find((c) => c.fileName == fileName).displayName;
 	let html = `<tr id="clip-row-${fileName}">`;
+	html += `<td class="checkbox-cell"><input type="checkbox" class="freeze-checkbox" id="freeze-${fileName}" /></td>`;
+	html += `<td class="checkbox-cell"><input type="checkbox" class="mute-checkbox" id="mute-${fileName}" onchange="toggleMute('${fileName}')" /></td>`;
 	html += `<td class="clip-name" id="clip-name-${fileName}">`;
 	html += `<img src="icons/close-24px.svg" onClick="removeClip('${fileName}')"/>`;
 	html += displayName;
@@ -676,6 +730,26 @@ function clipRow(fileName) {
 	html += '<td></td>';
 	html += '</tr>';
 	return html;
+}
+
+function toggleMute(fileName) {
+	const row = document.getElementById(`clip-row-${fileName}`);
+	const muteCheckbox = document.getElementById(`mute-${fileName}`);
+	if (muteCheckbox.checked) {
+		row.classList.add('muted');
+	} else {
+		row.classList.remove('muted');
+	}
+}
+
+function isRowFrozen(fileName) {
+	const freezeCheckbox = document.getElementById(`freeze-${fileName}`);
+	return freezeCheckbox && freezeCheckbox.checked;
+}
+
+function isRowMuted(fileName) {
+	const muteCheckbox = document.getElementById(`mute-${fileName}`);
+	return muteCheckbox && muteCheckbox.checked;
 }
 
 function clipCell(fileName, i) {
@@ -709,7 +783,7 @@ function addBeat() {
 		headerCell.classList.add('beat-number');
 		for (let i = 1; i < table.rows.length; i++) {
 			const row = table.rows[i];
-			const cellId = row.cells[0].id;
+			const cellId = row.cells[2].id;
 			const fileName = cellId.substring('clip-name-'.length);
 			const cell = row.insertCell(row.cells.length - 1);
 			cell.classList.add('note');
@@ -730,7 +804,7 @@ function addBeat() {
 		const table = document.getElementById('melody-measures-table');
 		for (let i = 0; i < table.rows.length; i++) {
 			const row = table.rows[i];
-			const cellId = row.cells[0].id;
+			const cellId = row.cells[2].id;
 			const fileName = cellId.substring('clip-name-'.length);
 			const cell = row.insertCell(row.cells.length - 1);
 			cell.classList.add('note');

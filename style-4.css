@@ -98,6 +98,42 @@
 	margin-top: 4px;
 }
 
+.checkbox-header {
+	font-size: 12px;
+	font-weight: bold;
+	text-align: center !important;
+	min-width: 40px !important;
+	padding: 2px !important;
+}
+
+.checkbox-cell {
+	text-align: center;
+	min-width: 40px !important;
+	background-color: transparent !important;
+}
+
+.checkbox-cell input {
+	cursor: pointer;
+	width: 16px;
+	height: 16px;
+}
+
+#mesure-tables table tr.muted .note {
+	background-color: #aaa !important;
+}
+
+#mesure-tables table tr.muted .note:hover {
+	background-color: #888 !important;
+}
+
+#mesure-tables table tr.muted .note.selected {
+	background-color: #777 !important;
+}
+
+#mesure-tables table tr.muted .clip-name {
+	background-color: #aaa;
+}
+
 .add-clip-container select {
 	min-width: 160px;
 	font-size: 18px;
