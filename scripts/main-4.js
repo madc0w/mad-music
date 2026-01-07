@@ -3,12 +3,14 @@ const numRandomNotes = 24;
 const buffers = {};
 let playingClips = [],
 	intervalId,
-	evolutionIntervalId,
+	addRemoveNotesIntervalId,
+	pitchEvolveIntervalId,
 	selectedFileName,
 	selectedMelodyBeatNum,
 	melodyNoteCell,
 	toggleButton,
-	evolveSlider,
+	addRemoveNotesSlider,
+	pitchEvolveSlider,
 	isSuppressCloseAll = false,
 	isPlaying = false;
 
@@ -116,29 +118,60 @@ function onLoad() {
 		document.getElementById('note-names').innerHTML = html;
 	}
 	{
-		const evolveCheckbox = document.getElementById('evolve-checkbox');
-		evolveSlider = document.getElementById('evolution-slider');
-		const evolveSliderContainer = document.getElementById(
-			'evolution-slider-container'
+		const addRemoveNotesCheckbox = document.getElementById(
+			'add-remove-notes-checkbox'
 		);
-		evolveSlider.onchange = () => {
-			clearInterval(evolutionIntervalId);
-			evolutionIntervalId = setInterval(
-				evolve,
-				8000 - evolveSlider.value * 600
+		addRemoveNotesSlider = document.getElementById('add-remove-notes-slider');
+		const addRemoveNotesSliderContainer = document.getElementById(
+			'add-remove-notes-slider-container'
+		);
+		addRemoveNotesSlider.onchange = () => {
+			clearInterval(addRemoveNotesIntervalId);
+			addRemoveNotesIntervalId = setInterval(
+				evolveAddRemoveNotes,
+				8000 - addRemoveNotesSlider.value * 600
 			);
 		};
-		evolveCheckbox.onchange = () => {
-			clearInterval(evolutionIntervalId);
-			evolutionIntervalId = null;
-			if (evolveCheckbox.checked) {
-				evolveSliderContainer.classList.remove('hidden');
-				evolutionIntervalId = setInterval(
-					evolve,
-					8000 - evolveSlider.value * 600
+		addRemoveNotesCheckbox.onchange = () => {
+			clearInterval(addRemoveNotesIntervalId);
+			addRemoveNotesIntervalId = null;
+			if (addRemoveNotesCheckbox.checked) {
+				addRemoveNotesSliderContainer.classList.remove('hidden');
+				addRemoveNotesIntervalId = setInterval(
+					evolveAddRemoveNotes,
+					8000 - addRemoveNotesSlider.value * 600
 				);
 			} else {
-				evolveSliderContainer.classList.add('hidden');
+				addRemoveNotesSliderContainer.classList.add('hidden');
+			}
+		};
+	}
+	{
+		const pitchEvolveCheckbox = document.getElementById(
+			'pitch-evolve-checkbox'
+		);
+		pitchEvolveSlider = document.getElementById('pitch-evolve-slider');
+		const pitchEvolveSliderContainer = document.getElementById(
+			'pitch-evolve-slider-container'
+		);
+		pitchEvolveSlider.onchange = () => {
+			clearInterval(pitchEvolveIntervalId);
+			pitchEvolveIntervalId = setInterval(
+				evolvePitch,
+				8000 - pitchEvolveSlider.value * 600
+			);
+		};
+		pitchEvolveCheckbox.onchange = () => {
+			clearInterval(pitchEvolveIntervalId);
+			pitchEvolveIntervalId = null;
+			if (pitchEvolveCheckbox.checked) {
+				pitchEvolveSliderContainer.classList.remove('hidden');
+				pitchEvolveIntervalId = setInterval(
+					evolvePitch,
+					8000 - pitchEvolveSlider.value * 600
+				);
+			} else {
+				pitchEvolveSliderContainer.classList.add('hidden');
 			}
 		};
 	}
@@ -203,8 +236,10 @@ function onLoad() {
 		} else {
 			clearInterval(intervalId);
 			intervalId = null;
-			clearInterval(evolutionIntervalId);
-			evolutionIntervalId = null;
+			clearInterval(addRemoveNotesIntervalId);
+			addRemoveNotesIntervalId = null;
+			clearInterval(pitchEvolveIntervalId);
+			pitchEvolveIntervalId = null;
 		}
 	};
 
@@ -231,12 +266,21 @@ function onLoad() {
 
 function loop() {
 	if (
-		document.getElementById('evolve-checkbox').checked &&
-		!evolutionIntervalId
+		document.getElementById('add-remove-notes-checkbox').checked &&
+		!addRemoveNotesIntervalId
 	) {
-		evolutionIntervalId = setInterval(
-			evolve,
-			8000 - evolveSlider.value * tempo
+		addRemoveNotesIntervalId = setInterval(
+			evolveAddRemoveNotes,
+			8000 - addRemoveNotesSlider.value * tempo
+		);
+	}
+	if (
+		document.getElementById('pitch-evolve-checkbox').checked &&
+		!pitchEvolveIntervalId
+	) {
+		pitchEvolveIntervalId = setInterval(
+			evolvePitch,
+			8000 - pitchEvolveSlider.value * tempo
 		);
 	}
 
@@ -248,7 +292,7 @@ function loop() {
 				continue;
 			}
 			const source = audioCtx.createBufferSource();
-			source.connect(audioCtx.destination);
+			source.connect(masterGain);
 			if (clip.type == 'melody') {
 				playMelody(clip);
 			} else {
@@ -416,7 +460,7 @@ function playMelody(clip) {
 	}
 	source.playbackRate.value = shiftedBuffers[clip.id].playbackRate;
 	source.buffer = shiftedBuffers[clip.id].buffer;
-	source.connect(audioCtx.destination);
+	source.connect(masterGain);
 	source.start();
 }
 
@@ -614,8 +658,10 @@ function reset() {
 	isPlaying = false;
 	clearInterval(intervalId);
 	intervalId = null;
-	clearInterval(evolutionIntervalId);
-	evolutionIntervalId = null;
+	clearInterval(addRemoveNotesIntervalId);
+	addRemoveNotesIntervalId = null;
+	clearInterval(pitchEvolveIntervalId);
+	pitchEvolveIntervalId = null;
 	toggleButton.innerHTML = 'GO';
 	playingClips = [];
 	const noteEls = document.getElementsByClassName('note');
@@ -644,9 +690,70 @@ function animate(el) {
 	}, 20);
 }
 
-function evolve() {
+function evolveAddRemoveNotes() {
 	addRandomNote();
 	removeRandomNote();
+}
+
+function evolvePitch() {
+	// Collect all melody notes that are not frozen
+	const melodyNotes = [];
+	for (let beatNum in playingClips) {
+		if (playingClips[beatNum]) {
+			for (const clip of playingClips[beatNum]) {
+				if (clip.type == 'melody' && !isRowFrozen(clip.fileName)) {
+					melodyNotes.push({
+						beatNum,
+						clip,
+					});
+				}
+			}
+		}
+	}
+
+	if (melodyNotes.length === 0) {
+		return;
+	}
+
+	// Pick a random melody note
+	const randomNote =
+		melodyNotes[Math.floor(Math.random() * melodyNotes.length)];
+	const clip = randomNote.clip;
+	const beatNum = randomNote.beatNum;
+
+	// Randomly choose pitch change: +2, +1, -1, or -2
+	const pitchChanges = [2, 1, -1, -2];
+	const pitchChange =
+		pitchChanges[Math.floor(Math.random() * pitchChanges.length)];
+
+	// Calculate new pitch index, capped to bounds
+	const newPitchIndex = Math.max(
+		0,
+		Math.min(noteNames.length - 1, clip.pitchIndex + pitchChange)
+	);
+
+	// Only update if pitch actually changed
+	if (newPitchIndex !== clip.pitchIndex) {
+		// Clear the cached shifted buffer since pitch changed
+		delete shiftedBuffers[clip.id];
+
+		// Update the pitch
+		clip.pitchIndex = newPitchIndex;
+
+		// Update the UI
+		const el = document.getElementById(`note-${clip.fileName}-${beatNum}`);
+		if (el) {
+			const durationSlider = document.getElementById('duration-slider');
+			const durationWidth =
+				(100 * (1 + Math.log2(clip.duration || 1) + 4)) /
+				(1 + parseInt(durationSlider.max));
+			let html = '';
+			html += `<div class="note-duration" style="width: ${durationWidth}%;"></div>`;
+			html += `<div>${noteNames[newPitchIndex]}</div>`;
+			el.innerHTML = html;
+			animate(el);
+		}
+	}
 }
 
 function compositionData() {

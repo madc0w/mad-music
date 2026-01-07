@@ -18,12 +18,34 @@ if (navigator.mediaDevices.getUserMedia) {
 	console.log('getUserMedia supported.');
 
 	const constraints = {
-		audio: true
+		audio: {
+			autoGainControl: false,
+			noiseSuppression: false,
+			echoCancellation: false,
+		},
 	};
 	let chunks = [];
 
-	let onSuccess = stream => {
-		const mediaRecorder = new MediaRecorder(stream);
+	let onSuccess = (stream) => {
+		// Create a gain node to reduce input volume and prevent clipping
+		const source = audioCtx.createMediaStreamSource(stream);
+		const gainNode = audioCtx.createGain();
+		gainNode.gain.value = 0.15; // Reduce volume to 15% to avoid clipping
+
+		// Use a compressor to prevent clipping
+		const compressor = audioCtx.createDynamicsCompressor();
+		compressor.threshold.value = -20;
+		compressor.knee.value = 10;
+		compressor.ratio.value = 12;
+		compressor.attack.value = 0;
+		compressor.release.value = 0.25;
+
+		const destination = audioCtx.createMediaStreamDestination();
+		source.connect(gainNode);
+		gainNode.connect(compressor);
+		compressor.connect(destination);
+
+		const mediaRecorder = new MediaRecorder(destination.stream);
 
 		visualize(stream);
 
@@ -35,7 +57,7 @@ if (navigator.mediaDevices.getUserMedia) {
 
 			stop.disabled = false;
 			record.disabled = true;
-		}
+		};
 
 		stop.onclick = function () {
 			mediaRecorder.stop();
@@ -47,12 +69,15 @@ if (navigator.mediaDevices.getUserMedia) {
 
 			stop.disabled = true;
 			record.disabled = false;
-		}
+		};
 
 		mediaRecorder.onstop = function (e) {
 			console.log('data available after MediaRecorder.stop() called.');
 
-			const clipName = prompt('Enter a name for your sound clip:', 'Unnamed clip');
+			const clipName = prompt(
+				'Enter a name for your sound clip:',
+				'Unnamed clip'
+			);
 
 			const clipContainer = document.createElement('article');
 			const clipLabel = document.createElement('p');
@@ -73,7 +98,7 @@ if (navigator.mediaDevices.getUserMedia) {
 
 			audio.controls = true;
 			const blob = new Blob(chunks, {
-				type: 'audio/ogg; codecs=opus'
+				type: 'audio/ogg; codecs=opus',
 			});
 			chunks = [];
 			const audioURL = window.URL.createObjectURL(blob);
@@ -83,24 +108,23 @@ if (navigator.mediaDevices.getUserMedia) {
 			deleteButton.onclick = function (e) {
 				let evtTgt = e.target;
 				evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
-			}
+			};
 
 			clipLabel.onclick = function () {
 				const existingName = clipLabel.textContent;
 				const newClipName = prompt('Enter a new name for your sound clip:');
 				clipLabel.textContent = newClipName || existingName;
-			}
-		}
+			};
+		};
 
 		mediaRecorder.ondataavailable = function (e) {
 			chunks.push(e.data);
-		}
-	}
+		};
+	};
 
-	navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, err => {
+	navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, (err) => {
 		alert(err);
 	});
-
 } else {
 	console.log('getUserMedia not supported on your browser!');
 }
@@ -118,7 +142,7 @@ function visualize(stream) {
 	draw();
 
 	function draw() {
-		const WIDTH = canvas.width
+		const WIDTH = canvas.width;
 		const HEIGHT = canvas.height;
 
 		requestAnimationFrame(draw);
@@ -136,7 +160,7 @@ function visualize(stream) {
 		let x = 0;
 		for (let i = 0; i < bufferLength; i++) {
 			let v = dataArray[i] / 128.0;
-			let y = v * HEIGHT / 2;
+			let y = (v * HEIGHT) / 2;
 
 			if (i === 0) {
 				canvasCtx.moveTo(x, y);
@@ -154,6 +178,6 @@ function visualize(stream) {
 
 window.onresize = function () {
 	canvas.width = mainSection.offsetWidth;
-}
+};
 
 window.onresize();

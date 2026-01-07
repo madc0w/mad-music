@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en-us">
-
 	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width">
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
 		<title>Mad Music</title>
 		<link rel="stylesheet" type="text/css" href="style.css" />
 		<link rel="stylesheet" type="text/css" href="style-4.css" />
@@ -12,11 +11,13 @@
 		<script type="text/javascript" src="scripts/clips.js"></script>
 		<script type="text/javascript" src="scripts/sampleCompositions.js"></script>
 		<script type="text/javascript" src="scripts/main-4.js"></script>
-		<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" />
+		<link
+			href="https://fonts.googleapis.com/css?family=Lato"
+			rel="stylesheet"
+		/>
 	</head>
 
 	<body onLoad="onLoad()">
-
 		<div id="save-modal" class="hidden modal">
 			<div class="modal-header">Save Composition</div>
 			<div>
@@ -27,16 +28,18 @@
 		</div>
 
 		<div id="load-modal" class="hidden modal">
-			<div class="modal-header">Load Composition </div>
+			<div class="modal-header">Load Composition</div>
 			<table id="compositions-list"></table>
 		</div>
 
 		<div id="share-modal" class="hidden modal">
-			<div class="modal-header">Share Composition </div>
+			<div class="modal-header">Share Composition</div>
 			<div>
 				<div>
-					This link will open your composition. It has been copied to your clipboard.<br />
-					Just paste this link anywhere to share your composition with someone you love!
+					This link will open your composition. It has been copied to your
+					clipboard.<br />
+					Just paste this link anywhere to share your composition with someone
+					you love!
 				</div>
 				<input type="text" id="share-url" />
 			</div>
@@ -44,8 +47,10 @@
 
 		<div class="main">
 			<div id="byline">
-				Brought to you by <a href="https://www.fofolabs.com">Marc A. Donis</a>. Thanks to <a target="freesound" href="https://freesound.org/">Freesound</a> for the
-				samples!
+				Brought to you by <a href="https://www.fofolabs.com">Marc A. Donis</a>.
+				Thanks to
+				<a target="freesound" href="https://freesound.org/">Freesound</a> for
+				the samples!
 			</div>
 			<div id="controls-div">
 				<button id="toggle-button">GO</button>
@@ -65,20 +70,51 @@
 				</div>
 				<div id="tempo-slider-container">
 					<label for="tempo-slider">Tempo</label>
-					<input type="range" min="100" max="800" value="600" id="tempo-slider" />
+					<input
+						type="range"
+						min="100"
+						max="800"
+						value="600"
+						id="tempo-slider"
+					/>
 				</div>
 				<div id="evolve-container">
-					<input id="evolve-checkbox" type="checkbox" />
-					<label for="evolve-checkbox">Evolve</label><br />
-					<div id="evolution-slider-container" class="hidden">
-						<span>slow</span><input type="range" min="0" max="10" value="2" id="evolution-slider" /> <span>fast</span>
+					<div id="add-remove-notes-container">
+						<input id="add-remove-notes-checkbox" type="checkbox" />
+						<label for="add-remove-notes-checkbox">Add/remove notes</label
+						><br />
+						<div id="add-remove-notes-slider-container" class="hidden">
+							<span>slow</span
+							><input
+								type="range"
+								min="0"
+								max="10"
+								value="2"
+								id="add-remove-notes-slider"
+							/>
+							<span>fast</span>
+						</div>
+					</div>
+					<div id="pitch-evolve-container">
+						<input id="pitch-evolve-checkbox" type="checkbox" />
+						<label for="pitch-evolve-checkbox">Pitch +/-</label><br />
+						<div id="pitch-evolve-slider-container" class="hidden">
+							<span>slow</span
+							><input
+								type="range"
+								min="0"
+								max="10"
+								value="2"
+								id="pitch-evolve-slider"
+							/>
+							<span>fast</span>
+						</div>
 					</div>
 				</div>
 			</div>
 			<div id="mesure-tables">
 				<div>
-					<table id="rhythm-measures-table">
-					</table>
+					<table id="rhythm-measures-table"></table>
 					<div class="add-clip-container" id="add-clip-container-rhythm"></div>
 				</div>
 				<div>
@@ -86,18 +122,23 @@
 					<div class="add-clip-container" id="add-clip-container-melody"></div>
 				</div>
 			</div>
-
 		</div>
 
 		<div id="note-selection" class="hidden modal">
 			<div id="note-duration-container">
 				Duration:
 				<div id="note-duration"></div>
-				<input id="duration-slider" type="range" min="0" max="8" value="4" onInput="durationChnage()" />
+				<input
+					id="duration-slider"
+					type="range"
+					min="0"
+					max="8"
+					value="4"
+					onInput="durationChnage()"
+				/>
 			</div>
 			<hr />
 			<div id="note-names"></div>
 		</div>
 	</body>
-
 </html>

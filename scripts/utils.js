@@ -36,6 +36,11 @@ const noteNames = [
 let measureNum = 0;
 const audioCtx = new AudioContext();
 
+// Master gain node to prevent clipping
+const masterGain = audioCtx.createGain();
+masterGain.gain.value = 0.4; // Reduce overall volume to 40%
+masterGain.connect(audioCtx.destination);
+
 function onLoad() {
 	playingNotesDiv = document.getElementById('playing-notes');
 	stopButton = document.getElementById('stop-button');
