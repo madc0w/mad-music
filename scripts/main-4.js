@@ -129,7 +129,7 @@ function onLoad() {
 			clearInterval(addRemoveNotesIntervalId);
 			addRemoveNotesIntervalId = setInterval(
 				evolveAddRemoveNotes,
-				8000 - addRemoveNotesSlider.value * 600
+				8000 - addRemoveNotesSlider.value * 760
 			);
 		};
 		addRemoveNotesCheckbox.onchange = () => {
@@ -139,7 +139,7 @@ function onLoad() {
 				addRemoveNotesSliderContainer.classList.remove('hidden');
 				addRemoveNotesIntervalId = setInterval(
 					evolveAddRemoveNotes,
-					8000 - addRemoveNotesSlider.value * 600
+					8000 - addRemoveNotesSlider.value * 760
 				);
 			} else {
 				addRemoveNotesSliderContainer.classList.add('hidden');
@@ -158,7 +158,7 @@ function onLoad() {
 			clearInterval(pitchEvolveIntervalId);
 			pitchEvolveIntervalId = setInterval(
 				evolvePitch,
-				8000 - pitchEvolveSlider.value * 600
+				8000 - pitchEvolveSlider.value * 760
 			);
 		};
 		pitchEvolveCheckbox.onchange = () => {
@@ -168,7 +168,7 @@ function onLoad() {
 				pitchEvolveSliderContainer.classList.remove('hidden');
 				pitchEvolveIntervalId = setInterval(
 					evolvePitch,
-					8000 - pitchEvolveSlider.value * 600
+					8000 - pitchEvolveSlider.value * 760
 				);
 			} else {
 				pitchEvolveSliderContainer.classList.add('hidden');
@@ -607,7 +607,7 @@ function setComposition(composition) {
 						cell.id = `note-${note.fileName}-${beatsPerMeasure - i - 1}`;
 						cell.classList.add('note');
 						cell.classList.add(`beat-${beatsPerMeasure - i - 1}`);
-						console.log(cell);
+						// console.log(cell);
 						cell.onclick = note.type = 'rhythm'
 							? () => {
 									toggleNote(cell, note.fileName, beatNum);
@@ -696,6 +696,7 @@ function evolveAddRemoveNotes() {
 }
 
 function evolvePitch() {
+	// console.log('evolvePitch');
 	// Collect all melody notes that are not frozen
 	const melodyNotes = [];
 	for (let beatNum in playingClips) {
@@ -736,6 +737,12 @@ function evolvePitch() {
 	if (newPitchIndex !== clip.pitchIndex) {
 		// Clear the cached shifted buffer since pitch changed
 		delete shiftedBuffers[clip.id];
+
+		// console.log(
+		// 	`Evolving pitch of ${clip.fileName} at beat ${beatNum} from ${
+		// 		noteNames[clip.pitchIndex]
+		// 	} to ${noteNames[newPitchIndex]}`
+		// );
 
 		// Update the pitch
 		clip.pitchIndex = newPitchIndex;
